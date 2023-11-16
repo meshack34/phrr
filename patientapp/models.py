@@ -543,7 +543,6 @@ class HealthGoal(models.Model):
 
 
 class EmergencyContact(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='emergency_contacts')
     name = models.CharField(max_length=255)
     relationship = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)

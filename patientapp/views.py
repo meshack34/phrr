@@ -98,23 +98,17 @@ from django.shortcuts import render, redirect
 from .models import EmergencyContact, Patient
 from .forms import EmergencyContactForm
 
+# views.py
+from django.shortcuts import render, redirect
+from .models import EmergencyContact
+from .forms import EmergencyContactForm
+
 def add_emergency_contact(request):
-    # Assuming the user is logged in
-    account = request.user  # Replace 'Account' with your actual user model
-
-    try:
-        patient = account.patient
-    except Patient.DoesNotExist:
-        # Handle the case where the user is not a patient or is not associated with a patient profile
-        return render(request, 'error_template.html', {'message': 'User is not a patient.'})
-
     if request.method == 'POST':
         form = EmergencyContactForm(request.POST)
         if form.is_valid():
-            emergency_contact = form.save(commit=False)
-            emergency_contact.patient = patient
-            emergency_contact.save()
-            return redirect('emergency_contacts_list')  # Redirect to a page showing all emergency contacts
+            form.save()
+            return redirect('emergency_contacts_list')  # Replace with your actual URL or view name
     else:
         form = EmergencyContactForm()
 

@@ -61,6 +61,7 @@ class PatientForm(forms.ModelForm):
         self.fields['country'].widget.attrs['class'] = 'form-control'
         self.fields['date_of_birth'].widget.attrs['class'] = 'form-control'
 
+# forms.py
 from django import forms
 from .models import EmergencyContact
 
@@ -69,6 +70,8 @@ class EmergencyContactForm(forms.ModelForm):
         model = EmergencyContact
         fields = ['name', 'relationship', 'phone_number', 'email_address', 'home_address']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 class DoctorForm(forms.ModelForm):
     class Meta:
