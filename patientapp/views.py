@@ -92,13 +92,21 @@ def display_health_goals(request):
     health_goals = HealthGoal.objects.filter(patient=current_patient)
     return render(request, 'display_health_goals.html', {'health_goals': health_goals, 'current_patient': current_patient})
 
+# views.py
+# views.py
 from django.shortcuts import render, redirect
-from .models import EmergencyContact
-from .forms import EmergencyContactForm  # Create a form for adding emergency contacts
+from .models import EmergencyContact, Patient
+from .forms import EmergencyContactForm
 
 def add_emergency_contact(request):
-    # Assuming the patient is logged in
-    patient = request.user.patient
+    # Assuming the user is logged in
+    account = request.user  # Replace 'Account' with your actual user model
+
+    try:
+        patient = account.patient
+    except Patient.DoesNotExist:
+        # Handle the case where the user is not a patient or is not associated with a patient profile
+        return render(request, 'error_template.html', {'message': 'User is not a patient.'})
 
     if request.method == 'POST':
         form = EmergencyContactForm(request.POST)
@@ -111,6 +119,7 @@ def add_emergency_contact(request):
         form = EmergencyContactForm()
 
     return render(request, 'add_emergency_contact.html', {'form': form})
+
 
 def add_emergency_contact(request):
     # Assuming the patient is logged in
@@ -1050,63 +1059,6 @@ def deletePrescItem(request, pres_id):
     presItem = Prescription.objects.get(id=pres_id)
     presItem.delete()
     return redirect(request.META.get('HTTP_REFERER')) #returning previous url/page
-
-
-# def Medication(request, patient_id):
-#     try:
-#         current_user = request.user
-#         patient = get_object_or_404(Patient, id=patient_id)
-#         current_doctor = get_object_or_404(Doctor, user=current_user)
-
-#         # Check if the current doctor has the medical history of the patient
-#         doctor_for_patient = MedicalHistoryy.objects.get(patient=patient, doctor=current_doctor)
-#         accepted_patient = MedicalHistoryy.objects.get(id=patient_id)
-#         speciality = DoctorSpecialization.objects.get(doctor=current_doctor)
-
-#         if request.method == 'POST':
-#             form = MedicalTreatmentForm(request.POST)
-#             if form.is_valid():
-#                 # Save the form with the current patient and doctor
-#                 medical_history = form.save(commit=False)
-#                 medical_history.save()
-                
-#                 # Handle the many-to-many relationships with selected checkboxes
-#                 form.save_m2m()
-
-#                 messages.success(request, f'Successfully Added Medical History for {patient}')
-#                 return redirect('home')
-#         else:
-#             # Initialize the form with the current patient
-#             form = MedicalTreatmentForm(initial={'patient': patient})
-
-        
-# # Assuming you have calculated the costs for each section in your view.
-#             costs_treatment = {...}  # Dictionary with treatment costs
-#             costs_review_of_systems = {...}  # Dictionary with review_of_systems costs
-#             costs_examination = {...}  # Dictionary with examination costs
-#             # Repeat this for other sections
-
-#             context = {
-#                 'form': form,
-#                 'current_patient': patient,
-#                 'doctor_for_patient': doctor_for_patient,
-#                 'current_doctor': current_doctor,
-#                 'speciality': speciality,
-#                 'accepted_patient': accepted_patient,
-#                 'costs_treatment': costs_treatment,
-#                 'costs_review_of_systems': costs_review_of_systems,
-#                 'costs_examination': costs_examination,
-#                 # Add costs for other sections here
-#             }
-
-#         return render(request, 'documents/medical_history_form.html', context)
-
-#     except Patient.DoesNotExist:
-#         # Handle the case where the patient does not exist
-#         return HttpResponseBadRequest("Patient not found")
-#     except Doctor.DoesNotExist:
-#         # Handle the case where the doctor does not exist
-#         return HttpResponseBadRequest("Doctor not found")
 
 
 
