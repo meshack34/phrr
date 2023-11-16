@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            {% include 'users/doctorsidenav.html' %}
+            <div class="col-md-7 col-lg-8 col-xl-9">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card dash-card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-lg-4">
+                                        <div class="dash-widget dct-border-rht">
+                                            <div class="circle-bar circle-bar1">
+                                                <div class="circle-graph1" data-percent="75">
+                                                    <img src="{% static 'img/icon-01.png' %}" class="img-fluid" alt="patient">
+                                                </div>
+                                            </div>
+                                            <div class="dash-widget-info">
+                                                <h6>Total Patients:</h6> <br>
+                                                <p>{{ total_patients }}</p>
+                                            </div><br>
+                                          
+                                            
+                                        </div>
+                                    </div>  <div class="dash-widget-info">
+                                        <h6>Patients Registered Today :</h6><br>
+                                        <p>{{ patients_registered_today }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Upcoming Appointment Tab -->
+                                <div class="tab-pane show active" id="upcoming-appointments">
+                                    <div class="card card-table mb-0">
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover table-center mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Patient ID</th>
+                                                            <th>Patient Name</th>
+                                                            <th> Date</th>
+                                                            <th>Medical History</th>
+                                                            <th>lab Report</th>
+                                                            <th>Confirmation</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for patient_appointment in patient_appointment %}
+                                                        <tr>
+                                                            <td>
+                                                                <h2 class="table-avatar">
+                                                                    <a href="{% url 'current_patient' patient_appointment.patient.id %}">PT-000-{{ patient_appointment.patient.id }}</a>
+                                                                </h2>
+                                                            </td>
+                                                            <td>
+                                                                <h2 class="table-avatar">
+                                                                    <a href="{% url 'current_patient' patient_appointment.patient.id %}">{{ patient_appointment.patient.user.first_name }} {{ patient_appointment.patient.user.last_name }}</a>
+                                                                </h2>
+                                                            </td>
+                                                            <td>{{ patient_appointment.date_created }} <span class="d-block text-info"></span></td>
+                                                            <td>
+                                                                <a href="{% url 'view_history' patient_appointment.patient.id %}" class="btn btn-sm bg-info-light">
+                                                                    <i class="far fa-eye"></i> View
+                                                                </a>
+                                                                <a href="{% url 'medical_history' %}" class="btn btn-sm bg-info-light">
+                                                                    <i class="fas fa-print"></i> Print
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <h2 class="table-avatar">
+                                                                    <a href="{% url 'lab_report' patient_appointment.patient.id %}">View</a>
+                                                                </h2>
+                                                            </td>
+                                                            <td class="text-left">
+                                                                <div class="table-action">
+                                                                    <form action="{% url 'doctor_dashboard' %}" method="post">
+                                                                        {% csrf_token %}
+                                                                        {% if patient_appointment.is_active %}
+                                                                        <a href="#">
+                                                                            <input type="hidden" name="status" value="{{ patient_appointment.id }}">
+                                                                            <button type="submit" class="btn btn-sm bg-success-light">
+                                                                                <i class="fas fa-check"></i> Confirmed
+                                                                            </button>
+                                                                        </a>
+                                                                        {% else %}
+                                                                        <a href="#">
+                                                                            <input type="hidden" name="status" value="{{ patient_appointment.id }}">
+                                                                            <button type="submit" class="btn btn-sm bg-primary-light">
+                                                                                <i class="fas fa-check"></i> Confirm
+                                                                            </button>
+                                                                        </a>
+                                                                        {% endif %}
+                                                                    </form>
+                                                                </div>
+                                                            </td>
+                                                           
+                                                                    
+                                                                
+                                                            
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

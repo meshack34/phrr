@@ -1,0 +1,124 @@
+<!-- insurance_app/templates/insurance_app/health_insurance_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Insurance List</title>
+    <!-- Add this to the head of your HTML file -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-hkLwUVjFfYpd3rC5J01Fnm3gXPu0EMuKb5xm8kVvq90ZFrB+1cGoC5XG46bF8u+5qNSLx2+jngi9UspGYTtKiQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #007BFF;
+        }
+
+        .add-insurance-link {
+            margin-bottom: 20px;
+        }
+
+        .add-insurance-link a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .add-insurance-link i {
+            margin-right: 10px;
+        }
+
+        .insurance-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .insurance-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .insurance-item img {
+            max-width: 100px;
+            margin-right: 20px;
+            border-radius: 8px;
+        }
+
+        .insurance-details {
+            flex-grow: 1;
+        }
+
+        .insurance-item h2 {
+            color: #007BFF;
+            margin-bottom: 10px;
+        }
+
+        .insurance-item p {
+            margin: 5px 0;
+        }
+
+        .view-details-link {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+            margin-top: 10px;
+            display: inline-block;
+            transition: color 0.3s;
+        }
+
+        .view-details-link:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Link for adding health insurance with an icon -->
+    <div class="add-insurance-link">
+        <a href="{% url 'add_health_insurance' %}">
+            <i class="fas fa-plus"></i> Add Health Insurance
+        </a>
+    </div>
+
+    <h1>Health Insurance List</h1>
+
+    <ul class="insurance-list">
+        {% for insurance in insurances %}
+            <li class="insurance-item">
+                {% if insurance.insurance_card_image %}
+                    <img src="{{ insurance.insurance_card_image.url }}" alt="Insurance Card">
+                {% endif %}
+                <div class="insurance-details">
+                    <h2>{{ insurance.company_name }}</h2>
+                    <p>Policy Member ID: {{ insurance.policy_member_id }}</p>
+                    <p>Group Number: {{ insurance.group_number }}</p>
+                    <p>Coverage Dates: {{ insurance.coverage_dates }}</p>
+                    <p>Contact Information: {{ insurance.contact_information }}</p>
+                    <p>Policy Holder Name: {{ insurance.policy_holder_name }}</p>
+                    <p>Policy Holder Relationship: {{ insurance.policy_holder_relationship }}</p>
+                    <p>Policy Holder Relationship: {{ insurance.insurance_card_image }}</p>
+                    {% comment %} <a href="{% url 'health_insurance_detail' insurance.id %}" class="view-details-link">
+                        View Details <i class="fas fa-arrow-circle-right"></i>
+                    </a> {% endcomment %}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

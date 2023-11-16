@@ -1,0 +1,31 @@
+<!-- add_health_goal.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <div style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 8px; padding: 20px;">
+      <h2 style="text-align: center; margin-bottom: 20px;">Add Health Goal</h2>
+      <form method="post" style="display: flex; flex-direction: column; gap: 15px;">
+        {% csrf_token %}
+        <div>
+          <label for="{{ form.goal_description.id_for_label }}" style="font-weight: bold;">Goal Description:</label>
+          {{ form.goal_description }}
+        </div>
+        <div>
+          <label for="{{ form.target_date.id_for_label }}" style="font-weight: bold;">Target Date:</label>
+          {{ form.target_date }}
+        </div>
+        <div>
+          <label for="{{ form.progress.id_for_label }}" style="font-weight: bold;">Progress:</label>
+          {{ form.progress }}
+        </div>
+        <div>
+          <label for="{{ form.status.id_for_label }}" style="font-weight: bold;">Status:</label>
+          {{ form.status }}
+        </div>
+        <button type="submit" style="background-color: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; align-self: center;">Save</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

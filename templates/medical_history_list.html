@@ -1,0 +1,107 @@
+<!-- templates/your_app/medical_history_list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medical History List</title>
+    <!-- Add your styling and CSS links here if needed -->
+    <!-- Add Font Awesome CSS link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-hkLwUVjFfYpd3rC5J01Fnm3gXPu0EMuKb5xm8kVvq90ZFrB+1cGoC5XG46bF8u+5qNSLx2+jngi9UspGYTtKiQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #007BFF;
+        }
+
+        .medical-history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .medical-history-table th,
+        .medical-history-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .medical-history-table th {
+            background-color: #007BFF;
+            color: #fff;
+        }
+
+        .medical-history-item-details a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+            display: inline-block;
+            transition: color 0.3s;
+        }
+
+        .medical-history-item-details a:hover {
+            color: #0056b3;
+        }
+
+        .add-medical-history-link {
+            margin-bottom: 20px;
+        }
+
+        .add-medical-history-link a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .add-medical-history-link i {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Link for adding medical history with an icon -->
+    <div class="add-medical-history-link">
+        <a href="{% url 'add_medical_history' %}">
+            <i class="fas fa-plus"></i> Add Medical History
+        </a>
+    </div>
+
+    <h1>Medical History List</h1>
+
+    <table class="medical-history-table">
+        <thead>
+            <tr>
+                <th>Condition Name</th>
+                <th>Diagnosis Date</th>
+                <th>Current</th>
+                <th>Number of Treatments</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for medical_history in medical_histories %}
+                <tr>
+                    <td>{{ medical_history.condition_name }}</td>
+                    <td>{{ medical_history.diagnosis_date }}</td>
+                    <td>{% if medical_history.is_current %} Yes {% else %} No {% endif %}</td>
+                    <td>{{ medical_history.treatment_records.count }}</td>
+                    <td class="medical-history-item-details">
+                        <a href="{% url 'medical_history_detail' medical_history.id %}">
+                            View Details <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

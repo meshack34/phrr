@@ -1,0 +1,48 @@
+<!-- mm.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Add Lifestyle Details</h2>
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Exercise Form -->
+    <fieldset>
+      <legend>Exercise</legend>
+      {{ exercise_form.as_p }}
+    </fieldset>
+
+    <!-- Dietary Form -->
+    <fieldset>
+      <legend>Dietary</legend>
+      {{ dietary_form.as_p }}
+    </fieldset>
+
+    <!-- Smoking Form -->
+    <fieldset>
+      <legend>Smoking</legend>
+      {{ smoking_form.as_p }}
+    </fieldset>
+
+    <!-- Alcohol Form -->
+    <fieldset>
+      <legend>Alcohol</legend>
+      {{ alcohol_form.as_p }}
+    </fieldset>
+
+    <!-- Medications Form -->
+    <fieldset>
+      <legend>Medications</legend>
+      {{ medications_form.as_p }}
+    </fieldset>
+
+    <!-- Lifestyle Form -->
+    <fieldset>
+      <legend>Lifestyle</legend>
+      {{ lifestyle_form.as_p }}
+    </fieldset>
+
+    <button type="submit">Save</button>
+  </form>
+{% endblock %}

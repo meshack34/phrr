@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Lifestyle Details</title>
+</head>
+<body>
+    <h2>Add Lifestyle Details</h2>
+
+    <form id="healthRecordForm" method="post">
+        {% csrf_token %}
+        
+        <!-- Exercise Regimen -->
+        <label for="exercise_type">Exercise Type:</label>
+        <input type="text" name="exercise_type" id="exercise_type">
+
+        <label for="exercise_duration">Exercise Duration (minutes):</label>
+        <input type="number" name="exercise_duration" id="exercise_duration">
+
+        <label for="exercise_frequency">Exercise Frequency:</label>
+        <input type="text" name="exercise_frequency" id="exercise_frequency">
+
+        <hr>
+
+        <!-- Dietary Habits -->
+        <label for="dietary_preferences">Dietary Preferences:</label>
+        <input type="text" name="dietary_preferences" id="dietary_preferences">
+
+        <label for="food_allergies">Food Allergies or Restrictions:</label>
+        <input type="text" name="food_allergies" id="food_allergies">
+
+        <label for="balanced_diet">Balanced Diet (focus on whole foods):</label>
+        <textarea name="balanced_diet" id="balanced_diet"></textarea>
+
+        <hr>
+
+        <!-- Medications -->
+        <label for="medications">Medications:</label>
+        <input type="text" name="medications" id="medications">
+
+        <label for="medication_dosage">Medication Dosage:</label>
+        <input type="text" name="medication_dosage" id="medication_dosage">
+
+        <label for="medication_instructions">Medication Usage Instructions:</label>
+        <textarea name="medication_instructions" id="medication_instructions"></textarea>
+
+        <hr>
+
+        <!-- Smoking Status -->
+   <!-- Smoking Status -->
+<!-- Smoking Status -->
+<!-- Smoking Status -->
+<label>Smoking Status:</label>
+<input type="checkbox" name="smoking_status_current" id="smoking_status_current">
+<label for="smoking_status_current">Current</label>
+
+<input type="checkbox" name="smoking_status_former" id="smoking_status_former">
+<label for="smoking_status_former">Former</label>
+
+<label for="quit_date" id="quitDateLabel" style="display: none;">Date Quit:</label>
+<input type="date" name="quit_date" id="quit_date" style="display: none;">
+
+<label for="cigarettes_per_day">Average Cigarettes per Day:</label>
+<input type="number" name="cigarettes_per_day" id="cigarettes_per_day">
+
+
+        <hr>
+
+        <!-- Alcohol Consumption -->
+        <label for="alcohol_consumption">Alcohol Consumption:</label>
+        <input type="checkbox" name="alcohol_consumption" id="alcohol_consumption">
+
+        <div id="alcoholDetails" style="display: none;">
+            <label for="alcohol_frequency">Frequency:</label>
+            <input type="text" name="alcohol_frequency" id="alcohol_frequency">
+
+            <label for="alcohol_types">Types of Alcohol Consumed:</label>
+            <input type="text" name="alcohol_types" id="alcohol_types">
+
+            <label for="alcohol_units_per_week">Average Units per Week:</label>
+            <input type="number" name="alcohol_units_per_week" id="alcohol_units_per_week">
+        </div>
+
+        <hr>
+
+        <!-- Additional Lifestyle Information -->
+        <label for="occupational_exposures">Occupational or Environmental Exposures:</label>
+        <textarea name="occupational_exposures" id="occupational_exposures"></textarea>
+
+        <hr>
+
+        <input type="submit" value="Save">
+    </form>
+
+    <script>
+        // Show/hide alcohol details based on the checkbox
+        const alcoholCheckbox = document.getElementById('alcohol_consumption');
+        const alcoholDetails = document.getElementById('alcoholDetails');
+
+        alcoholCheckbox.addEventListener('change', () => {
+            alcoholDetails.style.display = alcoholCheckbox.checked ? 'block' : 'none';
+        });
+        // Show/hide Quit date based on the selected smoking status
+    // Show/hide Quit date based on the checkbox state
+    const currentSmokerCheckbox = document.getElementById('smoking_status_current');
+    const formerSmokerCheckbox = document.getElementById('smoking_status_former');
+    const quitDateLabel = document.getElementById('quitDateLabel');
+    const quitDateInput = document.getElementById('quit_date');
+
+    function updateQuitDateVisibility() {
+        if (formerSmokerCheckbox.checked) {
+            quitDateLabel.style.display = 'block';
+            quitDateInput.style.display = 'block';
+            // Uncheck the currentSmokerCheckbox if formerSmokerCheckbox is checked
+            currentSmokerCheckbox.checked = false;
+        } else {
+            quitDateLabel.style.display = 'none';
+            quitDateInput.style.display = 'none';
+            // Uncheck the formerSmokerCheckbox if currentSmokerCheckbox is checked
+            formerSmokerCheckbox.checked = false;
+        }
+    }
+
+    currentSmokerCheckbox.addEventListener('change', updateQuitDateVisibility);
+    formerSmokerCheckbox.addEventListener('change', updateQuitDateVisibility);
+</script>
+</body>
+</html>

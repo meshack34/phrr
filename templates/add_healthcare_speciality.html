@@ -1,0 +1,61 @@
+<!-- templates/add_healthcare_speciality.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    h2, h3 {
+      color: #333;
+    }
+  </style>
+
+  <div class="container">
+    <h2>Add Healthcare Speciality</h2>
+    
+    <!-- Form to add a new speciality -->
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Save</button>
+    </form>
+
+    <!-- Display existing specialities -->
+    <h3>Existing Specialities:</h3>
+    <ul>
+      {% for speciality in existing_specialities %}
+        <li>{{ speciality.name }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

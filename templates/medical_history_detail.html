@@ -1,0 +1,29 @@
+<!-- templates/your_app/medical_history_detail.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medical History Details</title>
+    <!-- Add your styling and CSS links here if needed -->
+</head>
+<body>
+    <h1>Medical History Details</h1>
+    <p>Condition Name: {{ medical_history.condition_name }}</p>
+    <p>Diagnosis Date: {{ medical_history.diagnosis_date }}</p>
+    <p>Is Current: {{ medical_history.is_current }}</p>
+
+    <h2>Treatment Records</h2>
+    <ul>
+        {% for treatment_record in medical_history.treatment_records.all %}
+            <li>
+                Prescribed Medication: {{ treatment_record.prescribed_medication }}<br>
+                Dosage: {{ treatment_record.dosage }}<br>
+                Start Date: {{ treatment_record.start_date }}<br>
+                End Date: {{ treatment_record.end_date }}<br>
+                Monitoring Schedule: {{ treatment_record.monitoring_schedule }}<br>
+                Results: {{ treatment_record.results }}<br>
+                Date Recorded: {{ treatment_record.date_recorded }}<br>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
