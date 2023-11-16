@@ -540,3 +540,15 @@ class HealthGoal(models.Model):
     target_date = models.DateField()
     progress = models.IntegerField(default=0, help_text="Progress in percentage")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+
+class EmergencyContact(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='emergency_contacts')
+    name = models.CharField(max_length=255)
+    relationship = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15)
+    email_address = models.EmailField()
+    home_address = models.TextField()
+
+    def __str__(self):
+        return f"{self.name} - {self.relationship}"

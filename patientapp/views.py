@@ -92,6 +92,42 @@ def display_health_goals(request):
     health_goals = HealthGoal.objects.filter(patient=current_patient)
     return render(request, 'display_health_goals.html', {'health_goals': health_goals, 'current_patient': current_patient})
 
+from django.shortcuts import render, redirect
+from .models import EmergencyContact
+from .forms import EmergencyContactForm  # Create a form for adding emergency contacts
+
+def add_emergency_contact(request):
+    # Assuming the patient is logged in
+    patient = request.user.patient
+
+    if request.method == 'POST':
+        form = EmergencyContactForm(request.POST)
+        if form.is_valid():
+            emergency_contact = form.save(commit=False)
+            emergency_contact.patient = patient
+            emergency_contact.save()
+            return redirect('emergency_contacts_list')  # Redirect to a page showing all emergency contacts
+    else:
+        form = EmergencyContactForm()
+
+    return render(request, 'add_emergency_contact.html', {'form': form})
+
+def add_emergency_contact(request):
+    # Assuming the patient is logged in
+    patient = request.user.patient
+
+    if request.method == 'POST':
+        form = EmergencyContactForm(request.POST)
+        if form.is_valid():
+            emergency_contact = form.save(commit=False)
+            emergency_contact.patient = patient
+            emergency_contact.save()
+            return redirect('emergency_contacts_list')  # Redirect to a page showing all emergency contacts
+    else:
+        form = EmergencyContactForm()
+
+    return render(request, 'add_emergency_contact.html', {'form': form})
+
 
 def add_lifestyle_details(request):
     current_patient = get_current_patient(request)
