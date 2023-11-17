@@ -115,7 +115,16 @@ class Patient(models.Model):
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
 
-    
+class EmergencyContact(models.Model):
+    name = models.CharField(max_length=255)
+    relationship = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15)
+    email_address = models.EmailField()
+    home_address = models.TextField()
+
+    def __str__(self):
+        return f"{self.name} - {self.relationship}"
+
 
 class Doctor(models.Model):
     GENDER_CHOICES = [
@@ -361,33 +370,7 @@ class Appointment(models.Model):
     
     
     
- # Make sure to import Patient if it's defined in another module
 
-# class LabData(models.Model):
-#     LAB_DATA_CHOICES = [
-#         ('labtest', 'Lab Test'),
-#         ('labreport', 'Lab Report'),
-#         ('testresult', 'Test Result'),
-#     ]
-
-#     data_type = models.CharField(max_length=10, choices=LAB_DATA_CHOICES)
-#     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-#     date_of_collection = models.DateTimeField()
-#     ordering_physician = models.CharField(max_length=100)
-#     specimen_type = models.CharField(max_length=100, blank=True, null=True)
-#     comments = models.TextField(blank=True, null=True)
-#     name = models.CharField(max_length=100, blank=True, null=True)
-#     description = models.TextField(blank=True, null=True)
-#     normal_range = models.CharField(max_length=50, blank=True, null=True)
-#     test_code = models.CharField(max_length=20, unique=True, blank=True, null=True)
-#     methodology = models.TextField(blank=True, null=True)
-#     result_value = models.FloatField(blank=True, null=True)
-#     units = models.CharField(max_length=20, blank=True, null=True)
-#     is_abnormal = models.BooleanField(default=False)
-#     reference_range = models.CharField(max_length=50, blank=True, null=True)
-
-#     def __str__(self):
-#         return f"Lab Data - Type: {self.get_data_type_display()}, Patient: {self.patient}, Date: {self.date_of_collection}"
 from django.db import models
 from .models import Patient, Doctor
 from django.db import models
@@ -542,12 +525,3 @@ class HealthGoal(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
 
-class EmergencyContact(models.Model):
-    name = models.CharField(max_length=255)
-    relationship = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=15)
-    email_address = models.EmailField()
-    home_address = models.TextField()
-
-    def __str__(self):
-        return f"{self.name} - {self.relationship}"
