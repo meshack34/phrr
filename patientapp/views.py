@@ -40,25 +40,58 @@ def patientregister(request):
             phone_number = form.cleaned_data['phone_number']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            user_type = form.cleaned_data['user_type']
+
+            # Create a user without user_type
             username = email.split("@")[0]
-            user = Account.objects.create_user(first_name=first_name, last_name=last_name, email=email, username=username, password=password)
-            user.user_type = user_type
+            user = Account.objects.create_user(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                username=username,
+                password=password
+            )
+
+            # Set additional fields
             user.phone_number = phone_number
             user.save()
 
-            # Display a success message and redirect to login
             messages.success(request, 'Registration successful. You can now login.')
             return redirect('login')
                     
     else:
-        # Handle GET request by creating an empty form
         form = RegistrationForm()
     
     context = {
         'form': form
     }
     return render(request, 'users/register.html', context)
+
+# def patientregister(request):
+#     if request.method == 'POST':
+#         form = RegistrationForm(request.POST)
+#         if form.is_valid():
+#             # Extract cleaned data from the form
+#             first_name = form.cleaned_data['first_name']
+#             last_name = form.cleaned_data['last_name']
+#             phone_number = form.cleaned_data['phone_number']
+#             email = form.cleaned_data['email']
+#             password = form.cleaned_data['password']
+#             user_type = form.cleaned_data['user_type']
+#             username = email.split("@")[0]
+#             user = Account.objects.create_user(first_name=first_name, last_name=last_name, email=email, username=username, password=password)
+#             user.user_type = user_type
+#             user.phone_number = phone_number
+#             user.save()
+#             messages.success(request, 'Registration successful. You can now login.')
+#             return redirect('login')
+                    
+#     else:
+#         form = RegistrationForm()
+    
+#     context = {
+#         'form': form
+#     }
+#     return render(request, 'users/register.html', context)
 
 
 def patients_profile(request):
@@ -293,41 +326,73 @@ def doc_register(request):
     }
     return render(request, 'users/doctor-register.html', context)
 
+# def login(request):
+#     if request.method == 'POST':
+#         email = request.POST['email']
+#         password = request.POST['password']
+
+#         user = auth.authenticate(email=email, password = password)
+        
+#         if user is not None:
+#             auth.login(request, user)
+#             current_user = Account.objects.get(id=request.user.id)
+            
+
+#             if user.user_type == 'doctor': 
+#                 # print("current user: ", current_user)
+#                 doctor_exists = Doctor.objects.filter(user=current_user)
+#                 if doctor_exists:
+#                     return redirect('doctor_dashboard')
+#                 else:
+#                     doctor = Doctor(user=current_user)
+#                     doctor.save()
+#                     return redirect('doctor_dashboard')   
+
+#             else:
+#                 patient_exists = Patient.objects.filter(user=current_user)
+#                 if patient_exists:
+#                     return redirect('patient_dashboard')
+#                 else:
+#                     patient = Patient(user=current_user)
+#                     patient.save()
+#                     return redirect('patient_dashboard')
+#         else:
+#             messages.success(request, 'Invalid Credentials')
+#             return redirect('login')
+
+    
+#     return render(request, 'users/login.html')
+
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login as auth_login
+from .models import Account, Patient
+
 def login(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
 
-        user = auth.authenticate(email=email, password = password)
+        user = authenticate(email=email, password=password)
         
         if user is not None:
-            auth.login(request, user)
+            auth_login(request, user)
             current_user = Account.objects.get(id=request.user.id)
-            
 
-            if user.user_type == 'doctor': 
-                # print("current user: ", current_user)
-                doctor_exists = Doctor.objects.filter(user=current_user)
-                if doctor_exists:
-                    return redirect('doctor_dashboard')
-                else:
-                    doctor = Doctor(user=current_user)
-                    doctor.save()
-                    return redirect('doctor_dashboard')   
+            # Assuming that the user type is determined by the presence of a related Patient object
+            patient_exists = Patient.objects.filter(user=current_user).exists()
 
+            if patient_exists:
+                return redirect('patient_dashboard')
             else:
-                patient_exists = Patient.objects.filter(user=current_user)
-                if patient_exists:
-                    return redirect('patient_dashboard')
-                else:
-                    patient = Patient(user=current_user)
-                    patient.save()
-                    return redirect('patient_dashboard')
+                # Assuming that the user is not a doctor
+                patient = Patient(user=current_user)
+                patient.save()
+                return redirect('patient_dashboard')
         else:
             messages.success(request, 'Invalid Credentials')
             return redirect('login')
 
-    
     return render(request, 'users/login.html')
 
 @login_required(login_url='login')
