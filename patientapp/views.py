@@ -1,84 +1,30 @@
-from django.shortcuts import get_object_or_404, redirect, render
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Patient, MedicalHistoryy, DoctorSpecialization, Medication, Doctor
-from .forms import MedicalTreatmentForm
-from django.http import HttpResponseBadRequest
-from django.contrib import messages
-from .models import MedicalHistoryy, Patient
-from datetime import date
-from .forms import *
-from django.shortcuts import render, redirect
-from .models import EmergencyContact, Patient
-from .forms import EmergencyContactForm
-
-# views.py
-from django.shortcuts import render, redirect
-from .models import EmergencyContact
-from .forms import EmergencyContactForm
+from django.shortcuts import (render, redirect, get_object_or_404,)
 from .models import (
-    MedicalHistoryy,
-    Prescription,
-    Patient,
-    PrescriptionStatus,
-    Doctor,
-    DoctorSpecialization,
-    AppointmentTime,
-    PatientAppointment,
-    Account,
+    Patient, MedicalHistoryy, DoctorSpecialization, Medication, Doctor,
+    EmergencyContact, MedicalHistoryy, Prescription, PrescriptionStatus,
+    AppointmentTime, PatientAppointment, Account, Card, HealthcareExpert,
+    HealthcareSpeciality, HealthInsurance, TreatmentRecord,
 )
-from django.contrib import messages, auth
-import datetime
-from re import split
-from .doctorchoices import category, fromTimeChoice, toTimeChoice
+from .forms import (
+    MedicalTreatmentForm, RegistrationForm, PatientForm,
+    EmergencyContactForm, HealthcareExpertForm, HealthcareSpecialityForm,
+    HealthInsuranceForm, MedicalHistoryForm, TreatmentRecordForm,
+    ExerciseForm, DietaryForm, SmokingForm, AlcoholForm, MedicationsForm,
+    LifestyleForm, HealthGoalForm,
+)
+from django.http import HttpResponseBadRequest
 from django.http import FileResponse
-import io
+from io import BytesIO
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
+from django.contrib import messages, auth
+from datetime import date, datetime
+from re import split
+from .doctorchoices import category, fromTimeChoice, toTimeChoice
 from django.contrib.auth.decorators import login_required
+from .utils import get_current_patient
 
-from django.shortcuts import render
-from .models import Card  # Replace with your actual model
-from django.shortcuts import render
-from django.utils import timezone
-from .models import Patient  # Import your Patient model
-from django.shortcuts import render
-from .models import Account  # Import your Account model
-# views.py
-
-from django.shortcuts import render, redirect
-from .models import HealthcareExpert, HealthcareSpeciality
-from .forms import HealthcareExpertForm
-from django.shortcuts import render, redirect
-from .models import HealthcareSpeciality
-from .forms import HealthcareSpecialityForm
-from django.shortcuts import render, redirect
-from .models import HealthcareExpert
-from .forms import HealthcareExpertForm
-# insurance_app/views.py
-from django.shortcuts import render, redirect
-from .forms import HealthInsuranceForm
-from django.shortcuts import render
-from .models import HealthInsurance
-from django.shortcuts import render, redirect
-from django.utils import timezone
-from .models import MedicalHistory, TreatmentRecord
-from .forms import MedicalHistoryForm, TreatmentRecordForm
-from django.shortcuts import render, get_object_or_404
-from .models import MedicalHistory
-from django.shortcuts import render
-from .models import HealthInsurance
-from django.shortcuts import render, redirect
-from .utils import get_current_patient  
-
-# In your views.py
-from .forms import ExerciseForm, DietaryForm, SmokingForm, AlcoholForm, MedicationsForm, LifestyleForm
-
-# views.py
-
-from django.shortcuts import render, redirect
-from .forms import HealthGoalForm  # Create a form for HealthGoal if not already done
-from .models import HealthGoal
 
 def home(request):
     return render(request, 'home/index.html')
@@ -141,48 +87,14 @@ def calculate_age_years(date_of_birth):
         return age
     return None
 
-# def add_emergency_contact(request):
-#     if request.method == 'POST':
-#         form = EmergencyContactForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('emergency_contacts_list')  # Replace with your actual URL or view name
-#     else:
-#         form = EmergencyContactForm()
 
-#     return render(request, 'add_emergency_contact.html', {'form': form})
 
-# def add_emergency_contact(request):
-#     current_user = request.user
-#     current_patient = EmergencyContact.objects.get(user=current_user)
-
-#     if request.method == 'POST' and current_user.is_authenticated:
-#         form = EmergencyContactForm(request.POST, request.FILES, instance=current_patient)
-#         if form.is_valid():
-#             patient = form.save(commit=False)
-#             patient.save()  
-#             return redirect('patient_dashboard')
-#     else:
-#         form = PatientForm(instance=current_patient)
-
-#     context = {
-#         'patient': current_patient,
-#         'form': form,
-#     }
-#     return render(request, '/add_emergency_contact.html', context)
-
-# views.py
-
-from django.shortcuts import render, redirect
-from .forms import EmergencyContactForm
-from .models import Patient
 
 def manage_emergency_contact(request):
     current_user = request.user
     try:
         current_patient = Patient.objects.get(user=current_user)
     except Patient.DoesNotExist:
-        # Handle the case where the patient doesn't exist (optional)
         current_patient = None
 
     if request.method == 'POST' and current_user.is_authenticated:
