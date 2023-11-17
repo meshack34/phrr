@@ -1,10 +1,21 @@
 from django.shortcuts import (render, redirect, get_object_or_404,)
+from .models import *
+
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login as auth_login
+from .models import Account, Patient
 from .models import (
     Patient, MedicalHistoryy, DoctorSpecialization, Medication, Doctor,
     EmergencyContact, MedicalHistoryy, Prescription, PrescriptionStatus,
-    AppointmentTime, PatientAppointment, Account, Card, HealthcareExpert,
-    HealthcareSpeciality, HealthInsurance, TreatmentRecord,
+    AppointmentTime, PatientAppointment, Account, Card, HealthcareProfessional,HealthcareSpecialty,
+    HealthInsurance, TreatmentRecord,
 )
+# views.py
+from django.shortcuts import render, redirect
+from .models import HealthcareProfessional
+from .forms import HealthcareProfessionalForm  # Assuming you have a form for healthcare professionals
+
 from .forms import (
     MedicalTreatmentForm, RegistrationForm, PatientForm,
     EmergencyContactForm, HealthcareExpertForm, HealthcareSpecialityForm,
@@ -66,32 +77,39 @@ def patientregister(request):
     }
     return render(request, 'users/register.html', context)
 
-# def patientregister(request):
-#     if request.method == 'POST':
-#         form = RegistrationForm(request.POST)
-#         if form.is_valid():
-#             # Extract cleaned data from the form
-#             first_name = form.cleaned_data['first_name']
-#             last_name = form.cleaned_data['last_name']
-#             phone_number = form.cleaned_data['phone_number']
-#             email = form.cleaned_data['email']
-#             password = form.cleaned_data['password']
-#             user_type = form.cleaned_data['user_type']
-#             username = email.split("@")[0]
-#             user = Account.objects.create_user(first_name=first_name, last_name=last_name, email=email, username=username, password=password)
-#             user.user_type = user_type
-#             user.phone_number = phone_number
-#             user.save()
-#             messages.success(request, 'Registration successful. You can now login.')
-#             return redirect('login')
-                    
-#     else:
-#         form = RegistrationForm()
-    
-#     context = {
-#         'form': form
-#     }
-#     return render(request, 'users/register.html', context)
+
+def login(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
+
+        user = authenticate(email=email, password=password)
+        
+        if user is not None:
+            auth_login(request, user)
+            current_user = Account.objects.get(id=request.user.id)
+
+            # Assuming that the user type is determined by the presence of a related Patient object
+            patient_exists = Patient.objects.filter(user=current_user).exists()
+
+            if patient_exists:
+                return redirect('patient_dashboard')
+            else:
+                # Assuming that the user is not a doctor
+                patient = Patient(user=current_user)
+                patient.save()
+                return redirect('patient_dashboard')
+        else:
+            messages.success(request, 'Invalid Credentials')
+            return redirect('login')
+
+    return render(request, 'users/login.html')
+
+@login_required(login_url='login')
+def logout(request):
+    auth.logout(request)
+    messages.success(request, 'You are logged out.')
+    return redirect('home')
 
 
 def patients_profile(request):
@@ -137,8 +155,6 @@ def manage_emergency_contact(request):
             emergency_contact = form.save(commit=False)
             emergency_contact.user = current_user 
             emergency_contact.save()
-
-            # Link the emergency contact to the patient
             current_patient.emergency_contact = emergency_contact
             current_patient.save()
 
@@ -150,28 +166,6 @@ def manage_emergency_contact(request):
         'form': form,
     }
     return render(request, 'patients/manage_emergency_contact.html', context)
-
-
-
-def add_health_goal(request):
-    current_patient = get_current_patient(request)
-
-    if request.method == 'POST':
-        form = HealthGoalForm(request.POST)
-        if form.is_valid():
-            new_goal = form.save(commit=False)
-            new_goal.patient = current_patient
-            new_goal.save()
-            return redirect('display_health_goals')
-    else:
-        form = HealthGoalForm()
-
-    return render(request, 'add_health_goal.html', {'form': form, 'current_patient': current_patient})
-
-def display_health_goals(request):
-    current_patient = get_current_patient(request)
-    health_goals = HealthGoal.objects.filter(patient=current_patient)
-    return render(request, 'display_health_goals.html', {'health_goals': health_goals, 'current_patient': current_patient})
 
 
 def add_lifestyle_details(request):
@@ -227,22 +221,6 @@ def add_lifestyle_details(request):
 
 
 
-def health_insurance_list(request):
-    insurances = HealthInsurance.objects.all()
-    return render(request, 'health_insurance_detail.html', {'insurances': insurances})
-
-def add_health_insurance(request):
-    if request.method == 'POST':
-        form = HealthInsuranceForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('health_insurance_detail')  # Redirect to a view that lists all health insurances
-    else:
-        form = HealthInsuranceForm()
-    
-    return render(request, 'add_health_insurance.html', {'form': form})
-
-# views.py
 
 
 def add_medical_history(request):
@@ -272,8 +250,42 @@ def medical_history_list(request):
     medical_histories = MedicalHistory.objects.all()
     return render(request, 'medical_history_list.html', {'medical_histories': medical_histories})
 
+def add_healthcare_professional(request):
+    if request.user.is_authenticated:
+        patient = Patient.objects.get(user=request.user)
+
+        if request.method == 'POST':
+            form = HealthcareProfessionalForm(request.POST)
+            if form.is_valid():
+                professional = form.save(commit=False)
+                professional.patient = patient
+                professional.save()
+                return redirect('healthcare_professionals')
+        else:
+            form = HealthcareProfessionalForm()
+
+        context = {'form': form}
+        return render(request, 'add_healthcare_professional.html', context)
+    else:
+        # Handle unauthenticated user
+        return redirect('login')
+
+
+# views.py
+def healthcare_professionals(request):
+    if request.user.is_authenticated:
+        patient = Patient.objects.get(user=request.user)
+        professionals = patient.healthcare_professionals.all()
+
+        context = {'professionals': professionals}
+        return render(request, 'healthcare_professionals.html', context)
+    else:
+        # Handle unauthenticated user
+        return redirect('login')
+
+
 def add_healthcare_speciality(request):
-    existing_specialities = HealthcareSpeciality.objects.all()
+    existing_specialities = HealthcareSpecialty.objects.all()
     if request.method == 'POST':
         form = HealthcareSpecialityForm(request.POST)
         if form.is_valid():
@@ -283,23 +295,75 @@ def add_healthcare_speciality(request):
         form = HealthcareSpecialityForm()
     return render(request, 'add_healthcare_speciality.html', {'form': form, 'existing_specialities': existing_specialities})
 
-def add_healthcare_expert(request):
-    existing_experts = HealthcareExpert.objects.all()
+# views.py
 
-    if request.method == 'POST':
-        form = HealthcareExpertForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('view_healthcare_experts')  # Redirect to the same page to see the updated list
+
+def add_health_insurance(request):
+    if request.user.is_authenticated:
+        patient = Patient.objects.get(user=request.user)
+
+        if request.method == 'POST':
+            form = HealthInsuranceForm(request.POST, request.FILES)
+            if form.is_valid():
+                insurance = form.save(commit=False)
+                insurance.patient = patient
+                insurance.save()
+                return redirect('health_insurance_list')
+        else:
+            form = HealthInsuranceForm()
+
+        context = {'form': form}
+        return render(request, 'add_health_insurance.html', context)
     else:
-        form = HealthcareExpertForm()
+        # Handle unauthenticated user
+        return redirect('login')
+    
+def health_insurance_list(request):
+    if request.user.is_authenticated:
+        patient = Patient.objects.get(user=request.user)
+        health_insurances = patient.health_insurances.all()
 
-    return render(request, 'add_healthcare_expert.html', {'form': form, 'existing_experts': existing_experts})
+        context = {'health_insurances': health_insurances}
+        return render(request, 'health_insurance_list.html', context)
+    else:
+        # Handle unauthenticated user
+        return redirect('login')
 
-def view_healthcare_experts(request):
-    existing_experts = HealthcareExpert.objects.all()
-    return render(request, 'view_healthcare_experts.html', {'existing_experts': existing_experts})
+# views.py
 
+def add_health_goal(request):
+    if request.user.is_authenticated:
+        patient = Patient.objects.get(user=request.user)
+
+        if request.method == 'POST':
+            form = HealthGoalForm(request.POST)
+            if form.is_valid():
+                health_goal = form.save(commit=False)
+                health_goal.patient = patient
+                health_goal.save()
+                return redirect('health_goal_list')
+        else:
+            form = HealthGoalForm()
+
+        context = {'form': form}
+        return render(request, 'add_health_goal.html', context)
+    else:
+        # Handle unauthenticated user
+        return redirect('login')
+
+def health_goal_list(request):
+    if request.user.is_authenticated:
+        patient = Patient.objects.get(user=request.user)
+        health_goals = patient.health_goals.all()
+
+        context = {'health_goals': health_goals}
+        return render(request, 'display_health_goals.html', context)
+    else:
+        # Handle unauthenticated user
+        return redirect('login')
+
+
+#######################################
 
 def doc_register(request):
     if request.method == 'POST':
@@ -327,80 +391,7 @@ def doc_register(request):
     }
     return render(request, 'users/doctor-register.html', context)
 
-# def login(request):
-#     if request.method == 'POST':
-#         email = request.POST['email']
-#         password = request.POST['password']
 
-#         user = auth.authenticate(email=email, password = password)
-        
-#         if user is not None:
-#             auth.login(request, user)
-#             current_user = Account.objects.get(id=request.user.id)
-            
-
-#             if user.user_type == 'doctor': 
-#                 # print("current user: ", current_user)
-#                 doctor_exists = Doctor.objects.filter(user=current_user)
-#                 if doctor_exists:
-#                     return redirect('doctor_dashboard')
-#                 else:
-#                     doctor = Doctor(user=current_user)
-#                     doctor.save()
-#                     return redirect('doctor_dashboard')   
-
-#             else:
-#                 patient_exists = Patient.objects.filter(user=current_user)
-#                 if patient_exists:
-#                     return redirect('patient_dashboard')
-#                 else:
-#                     patient = Patient(user=current_user)
-#                     patient.save()
-#                     return redirect('patient_dashboard')
-#         else:
-#             messages.success(request, 'Invalid Credentials')
-#             return redirect('login')
-
-    
-#     return render(request, 'users/login.html')
-
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login
-from .models import Account, Patient
-
-def login(request):
-    if request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
-
-        user = authenticate(email=email, password=password)
-        
-        if user is not None:
-            auth_login(request, user)
-            current_user = Account.objects.get(id=request.user.id)
-
-            # Assuming that the user type is determined by the presence of a related Patient object
-            patient_exists = Patient.objects.filter(user=current_user).exists()
-
-            if patient_exists:
-                return redirect('patient_dashboard')
-            else:
-                # Assuming that the user is not a doctor
-                patient = Patient(user=current_user)
-                patient.save()
-                return redirect('patient_dashboard')
-        else:
-            messages.success(request, 'Invalid Credentials')
-            return redirect('login')
-
-    return render(request, 'users/login.html')
-
-@login_required(login_url='login')
-def logout(request):
-    auth.logout(request)
-    messages.success(request, 'You are logged out.')
-    return redirect('home')
 
 
 def doctor_dashboard(request):

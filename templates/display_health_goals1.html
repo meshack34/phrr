@@ -1,0 +1,35 @@
+<!-- display_health_goals.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Health Goals</h2>
+    {% if health_goals %}
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover text-center">
+          <thead class="thead-dark">
+            <tr>
+              <th>Description</th>
+              <th>Target Date</th>
+              <th>Progress</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for goal in health_goals %}
+              <tr>
+                <td>{{ goal.goal_description }}</td>
+                <td>{{ goal.target_date }}</td>
+                <td>{{ goal.progress }}%</td>
+                <td>{{ goal.get_status_display }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-center">No health goals set.</p>
+    {% endif %}
+  </div>
+{% endblock %}

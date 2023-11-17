@@ -1,0 +1,108 @@
+<!-- insurance_app/templates/insurance_app/add_health_insurance.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Health Insurance</title>
+    <!-- Add this to the head of your HTML file -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-hkLwUVjFfYpd3rC5J01Fnm3gXPu0EMuKb5xm8kVvq90ZFrB+1cGoC5XG46bF8u+5qNSLx2+jngi9UspGYTtKiQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {{ form.media }}
+
+    <style>
+        body {
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .add-insurance-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .form-group img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+        }
+
+        .form-group button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add Health Insurance</h1>
+
+    <div class="add-insurance-form">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_company_name">Company Name:</label>
+                {{ form.company_name }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_policy_member_id">Policy Member ID:</label>
+                {{ form.policy_member_id }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_group_number">Group Number:</label>
+                {{ form.group_number }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_coverage_dates">Coverage Dates:</label>
+                {{ form.coverage_dates }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_contact_information">Contact Information:</label>
+                {{ form.contact_information }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_policy_holder_name">Policy Holder Name:</label>
+                {{ form.policy_holder_name }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_policy_holder_relationship">Policy Holder Relationship:</label>
+                {{ form.policy_holder_relationship }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_insurance_card_image">Insurance Card Image:</label>
+                {{ form.insurance_card_image }}
+            </div>
+
+            <button type="submit">Save</button>
+        </form>
+    </div>
+</body>
+</html>

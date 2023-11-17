@@ -112,7 +112,9 @@
                     <p>Contact Information: {{ insurance.contact_information }}</p>
                     <p>Policy Holder Name: {{ insurance.policy_holder_name }}</p>
                     <p>Policy Holder Relationship: {{ insurance.policy_holder_relationship }}</p>
-                    <p>Policy Holder Relationship: {{ insurance.insurance_card_image }}</p>
+                    <p>Policy Holder Relationship: 
+                        <img src="{{ insurance.insurance_card_image.url }}" alt="Insurance Card">
+                    </p>
                     {% comment %} <a href="{% url 'health_insurance_detail' insurance.id %}" class="view-details-link">
                         View Details <i class="fas fa-arrow-circle-right"></i>
                     </a> {% endcomment %}

@@ -120,6 +120,49 @@ class Patient(models.Model):
         return f'{self.user.first_name} {self.user.last_name}'
 
 
+class HealthcareSpecialty(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Healthcare Specialty'
+        verbose_name_plural = 'Healthcare Specialties'
+
+class HealthcareProfessional(models.Model):
+    profile_image = models.ImageField(upload_to='healthcare_professionals/%Y/%m/%d/', default='default.png')
+    name = models.CharField(max_length=255)
+    health_facility = models.CharField(max_length=255)
+    phone = models.CharField(max_length=15)
+    email = models.EmailField()
+    speciality = models.ForeignKey(HealthcareSpecialty, on_delete=models.CASCADE)
+    address = models.TextField()
+    working_hours = models.CharField(max_length=255)
+    education = models.TextField()
+    experience_years = models.PositiveIntegerField()
+    certifications = models.TextField()
+    services_offered = models.TextField()
+    languages_spoken = models.TextField()
+    emergency_contact = models.CharField(max_length=15)
+    insurance_accepted = models.TextField()
+    appointment_booking_info = models.TextField()
+    patient_reviews = models.TextField()
+    professional_memberships = models.TextField()
+    additional_notes = models.TextField()
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='healthcare_professionals')
+
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = 'Healthcare Professional'
+        verbose_name_plural = 'Healthcare Professionals'
+
+
+
+
 
 class Doctor(models.Model):
     GENDER_CHOICES = [
@@ -435,37 +478,8 @@ class Lifestyle(models.Model):
 
 
 
-
-class HealthcareSpeciality(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-class HealthcareExpert(models.Model):
-    name = models.CharField(max_length=255)
-    health_facility = models.CharField(max_length=255)
-    phone = models.CharField(max_length=15)
-    email = models.EmailField()
-    speciality = models.ForeignKey(HealthcareSpeciality, on_delete=models.CASCADE)
-    address = models.TextField()
-    working_hours = models.CharField(max_length=255)
-    education = models.TextField()
-    experience_years = models.PositiveIntegerField()
-    certifications = models.TextField()
-    services_offered = models.TextField()
-    languages_spoken = models.TextField()
-    emergency_contact = models.CharField(max_length=15)
-    insurance_accepted = models.TextField()
-    appointment_booking_info = models.TextField()
-    patient_reviews = models.TextField()
-    professional_memberships = models.TextField()
-    additional_notes = models.TextField()
-
-    def __str__(self):
-        return self.name
-
 class HealthInsurance(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='health_insurances',)
     company_name = models.CharField(max_length=100)
     policy_member_id = models.CharField(max_length=100)
     group_number = models.CharField(max_length=100, blank=True, null=True)
@@ -498,6 +512,8 @@ class TreatmentRecord(models.Model):
     def __str__(self):
         return f"Medication: {self.prescribed_medication}, Start Date: {self.start_date}"
 
+
+
 class HealthGoal(models.Model):
     STATUS_CHOICES = [
         ('in_progress', 'In Progress'),
@@ -505,10 +521,8 @@ class HealthGoal(models.Model):
         ('complete', 'Complete'),
     ]
 
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='health_goals')
     goal_description = models.CharField(max_length=200)
     target_date = models.DateField()
     progress = models.IntegerField(default=0, help_text="Progress in percentage")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-
-

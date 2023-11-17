@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+
+
+  .dispaly {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  form {
+    margin-bottom: 20px;
+  }
+
+  button {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  h2, h3 {
+    color: #333;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .counter {
+    color: #777;
+    margin-top: 10px;
+  }
+</style>
+  <div class="content">
+    <div class="container-fluid">
+      <div class="row">
+        
+        {% include 'users/patientsidenav.html' %}
+
+        <div class="col-md-7 col-lg-8 col-xl-9">
+          <div class="card">
+            <div class="card-body">
+              <h2>Health professional</h2>
+              <!-- Emergency Contact Form -->
+              <div class="dispaly">
+                  <a href="{% url 'add_healthcare_professional' %}">
+                    <i class="fas fa-plus-circle"></i> Add Health professional
+                  </a>
+                </div>
+  
+              <h3>Health professional Available:</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                  </tr>
+                </thead>
+                
+                <tbody>
+                  {% for professional in professionals %}
+                    <tr>
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ professional.name }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              <p class="counter">Total professional: {{ professionals|length }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
