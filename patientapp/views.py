@@ -7,6 +7,14 @@ from django.contrib import messages
 from .models import MedicalHistoryy, Patient
 from datetime import date
 from .forms import *
+from django.shortcuts import render, redirect
+from .models import EmergencyContact, Patient
+from .forms import EmergencyContactForm
+
+# views.py
+from django.shortcuts import render, redirect
+from .models import EmergencyContact
+from .forms import EmergencyContactForm
 from .models import (
     MedicalHistoryy,
     Prescription,
@@ -72,6 +80,133 @@ from django.shortcuts import render, redirect
 from .forms import HealthGoalForm  # Create a form for HealthGoal if not already done
 from .models import HealthGoal
 
+def home(request):
+    return render(request, 'home/index.html')
+
+
+def patientregister(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            # Extract cleaned data from the form
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            phone_number = form.cleaned_data['phone_number']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user_type = form.cleaned_data['user_type']
+            username = email.split("@")[0]
+            user = Account.objects.create_user(first_name=first_name, last_name=last_name, email=email, username=username, password=password)
+            user.user_type = user_type
+            user.phone_number = phone_number
+            user.save()
+
+            # Display a success message and redirect to login
+            messages.success(request, 'Registration successful. You can now login.')
+            return redirect('login')
+                    
+    else:
+        # Handle GET request by creating an empty form
+        form = RegistrationForm()
+    
+    context = {
+        'form': form
+    }
+    return render(request, 'users/register.html', context)
+
+
+def patients_profile(request):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+
+    if request.method == 'POST' and current_user.is_authenticated:
+        form = PatientForm(request.POST, request.FILES, instance=current_patient)
+        if form.is_valid():
+            patient = form.save(commit=False)
+            patient.age_years = calculate_age_years(patient.date_of_birth)
+            patient.save()  
+            return redirect('patient_dashboard')
+    else:
+        form = PatientForm(instance=current_patient)
+
+    context = {
+        'patient': current_patient,
+        'form': form,
+    }
+    return render(request, 'patients/patients-profile.html', context)
+def calculate_age_years(date_of_birth):
+    today = date.today()
+    if date_of_birth:
+        age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
+        return age
+    return None
+
+# def add_emergency_contact(request):
+#     if request.method == 'POST':
+#         form = EmergencyContactForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('emergency_contacts_list')  # Replace with your actual URL or view name
+#     else:
+#         form = EmergencyContactForm()
+
+#     return render(request, 'add_emergency_contact.html', {'form': form})
+
+# def add_emergency_contact(request):
+#     current_user = request.user
+#     current_patient = EmergencyContact.objects.get(user=current_user)
+
+#     if request.method == 'POST' and current_user.is_authenticated:
+#         form = EmergencyContactForm(request.POST, request.FILES, instance=current_patient)
+#         if form.is_valid():
+#             patient = form.save(commit=False)
+#             patient.save()  
+#             return redirect('patient_dashboard')
+#     else:
+#         form = PatientForm(instance=current_patient)
+
+#     context = {
+#         'patient': current_patient,
+#         'form': form,
+#     }
+#     return render(request, '/add_emergency_contact.html', context)
+
+# views.py
+
+from django.shortcuts import render, redirect
+from .forms import EmergencyContactForm
+from .models import Patient
+
+def manage_emergency_contact(request):
+    current_user = request.user
+    try:
+        current_patient = Patient.objects.get(user=current_user)
+    except Patient.DoesNotExist:
+        # Handle the case where the patient doesn't exist (optional)
+        current_patient = None
+
+    if request.method == 'POST' and current_user.is_authenticated:
+        form = EmergencyContactForm(request.POST, instance=current_patient.emergency_contact)
+        if form.is_valid():
+            emergency_contact = form.save(commit=False)
+            emergency_contact.user = current_user 
+            emergency_contact.save()
+
+            # Link the emergency contact to the patient
+            current_patient.emergency_contact = emergency_contact
+            current_patient.save()
+
+            return redirect('patient_dashboard')
+    else:
+        form = EmergencyContactForm(instance=current_patient.emergency_contact)
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'patients/manage_emergency_contact.html', context)
+
+
+
 def add_health_goal(request):
     current_patient = get_current_patient(request)
 
@@ -91,45 +226,6 @@ def display_health_goals(request):
     current_patient = get_current_patient(request)
     health_goals = HealthGoal.objects.filter(patient=current_patient)
     return render(request, 'display_health_goals.html', {'health_goals': health_goals, 'current_patient': current_patient})
-
-# views.py
-# views.py
-from django.shortcuts import render, redirect
-from .models import EmergencyContact, Patient
-from .forms import EmergencyContactForm
-
-# views.py
-from django.shortcuts import render, redirect
-from .models import EmergencyContact
-from .forms import EmergencyContactForm
-
-def add_emergency_contact(request):
-    if request.method == 'POST':
-        form = EmergencyContactForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('emergency_contacts_list')  # Replace with your actual URL or view name
-    else:
-        form = EmergencyContactForm()
-
-    return render(request, 'add_emergency_contact.html', {'form': form})
-
-
-def add_emergency_contact(request):
-    # Assuming the patient is logged in
-    patient = request.user.patient
-
-    if request.method == 'POST':
-        form = EmergencyContactForm(request.POST)
-        if form.is_valid():
-            emergency_contact = form.save(commit=False)
-            emergency_contact.patient = patient
-            emergency_contact.save()
-            return redirect('emergency_contacts_list')  # Redirect to a page showing all emergency contacts
-    else:
-        form = EmergencyContactForm()
-
-    return render(request, 'add_emergency_contact.html', {'form': form})
 
 
 def add_lifestyle_details(request):
@@ -257,42 +353,6 @@ def add_healthcare_expert(request):
 def view_healthcare_experts(request):
     existing_experts = HealthcareExpert.objects.all()
     return render(request, 'view_healthcare_experts.html', {'existing_experts': existing_experts})
-
-def home(request):
-    return render(request, 'home/index.html')
-
-
-def patientregister(request):
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            # Extract cleaned data from the form
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
-            phone_number = form.cleaned_data['phone_number']
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            user_type = form.cleaned_data['user_type']
-            username = email.split("@")[0]
-            user = Account.objects.create_user(first_name=first_name, last_name=last_name, email=email, username=username, password=password)
-            user.user_type = user_type
-            user.phone_number = phone_number
-            user.save()
-
-            # Display a success message and redirect to login
-            messages.success(request, 'Registration successful. You can now login.')
-            return redirect('login')
-                    
-    else:
-        # Handle GET request by creating an empty form
-        form = RegistrationForm()
-    
-    context = {
-        'form': form
-    }
-    return render(request, 'users/register.html', context)
-
-
 
 
 def doc_register(request):
@@ -502,33 +562,6 @@ def getPrescriptionForDoc(request, patient_id):
     return response
 
 
-
-def patients_profile(request):
-    current_user = request.user
-    current_patient = Patient.objects.get(user=current_user)
-
-    if request.method == 'POST' and current_user.is_authenticated:
-        form = PatientForm(request.POST, request.FILES, instance=current_patient)
-        if form.is_valid():
-            patient = form.save(commit=False)
-            patient.age_years = calculate_age_years(patient.date_of_birth)
-            patient.save()  
-            return redirect('patient_dashboard')
-    else:
-        form = PatientForm(instance=current_patient)
-
-    context = {
-        'patient': current_patient,
-        'form': form,
-    }
-    return render(request, 'patients/patients-profile.html', context)
-
-def calculate_age_years(date_of_birth):
-    today = date.today()
-    if date_of_birth:
-        age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
-        return age
-    return None
 
 def doctor_profile(request):
     current_user = request.user

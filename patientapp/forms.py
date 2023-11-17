@@ -5,6 +5,9 @@ from django.forms.widgets import PasswordInput
 from django import forms
 from django.forms import DateInput, DateField, PasswordInput
 
+# forms.py
+from django import forms
+from .models import EmergencyContact
       
             
 class MedicalTreatmentForm(forms.ModelForm):
@@ -61,9 +64,6 @@ class PatientForm(forms.ModelForm):
         self.fields['country'].widget.attrs['class'] = 'form-control'
         self.fields['date_of_birth'].widget.attrs['class'] = 'form-control'
 
-# forms.py
-from django import forms
-from .models import EmergencyContact
 
 class EmergencyContactForm(forms.ModelForm):
     class Meta:
@@ -72,6 +72,12 @@ class EmergencyContactForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs['class'] = 'form-control'
+        self.fields['relationship'].widget.attrs['class'] = 'form-control'
+        self.fields['phone_number'].widget.attrs['class'] = 'form-control'
+        self.fields['email_address'].widget.attrs['class'] = 'form-control'
+        self.fields['home_address'].widget.attrs['class'] = 'form-control'
+
 
 class DoctorForm(forms.ModelForm):
     class Meta:

@@ -1,21 +1,15 @@
-from datetime import datetime
+from datetime import date, datetime
 from django.utils import timezone
-from datetime import datetime
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
-from datetime import date
-from datetime import datetime
+from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.enums import Choices
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.shortcuts import redirect
 from multiselectfield import MultiSelectField
-from django.db import models
-from django.contrib.auth.models import  AbstractBaseUser , BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from .models import *
 
-# Create your models here.
-# models.py
-
-from django.db import models
 
 class Card(models.Model):
     title = models.CharField(max_length=100)
@@ -85,7 +79,17 @@ class Account(AbstractBaseUser):
 
     def has_module_perms(self, add_label):
         return True
+    
+class EmergencyContact(models.Model):
+    user = models.OneToOneField(Account, on_delete=models.CASCADE, related_name='emergency_contact')
+    name = models.CharField(max_length=255)
+    relationship = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15)
+    email_address = models.EmailField()
+    home_address = models.TextField()
 
+    def __str__(self):
+        return f"{self.name} - {self.relationship}"
 
 class Patient(models.Model):
     GENDER_CHOICES = [
@@ -94,6 +98,7 @@ class Patient(models.Model):
         ('Other', 'Other'),
     ]
     profile_image = models.ImageField(upload_to='patients/%Y/%m/%d/', default='default.png')
+    emergency_contact = models.OneToOneField(EmergencyContact, on_delete=models.SET_NULL, null=True, blank=True)
     city = models.CharField(max_length=100, null=True)
     address = models.CharField(max_length=100, null=True)
     country = models.CharField(max_length=100, null=True)
@@ -115,15 +120,6 @@ class Patient(models.Model):
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
 
-class EmergencyContact(models.Model):
-    name = models.CharField(max_length=255)
-    relationship = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=15)
-    email_address = models.EmailField()
-    home_address = models.TextField()
-
-    def __str__(self):
-        return f"{self.name} - {self.relationship}"
 
 
 class Doctor(models.Model):
@@ -367,14 +363,6 @@ class Appointment(models.Model):
 
     def __str__(self):
         return self.patient.user.first_name
-    
-    
-    
-
-from django.db import models
-from .models import Patient, Doctor
-from django.db import models
-from django.db import models
 
 class LabReport(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)

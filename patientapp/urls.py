@@ -13,7 +13,7 @@ urlpatterns = [
     path('add_lifestyle_details/', views.add_lifestyle_details, name='add_lifestyle_details'),
     path('add_health_goal/', views.add_health_goal, name='add_health_goal'),
     path('display_health_goals/', views.display_health_goals, name='display_health_goals'),
-    path('add_emergency_contact/', views.add_emergency_contact, name='add_emergency_contact'),
+    path('manage_emergency_contact/', views.manage_emergency_contact, name='manage_emergency_contact'),
   
    
      #complete order urls
