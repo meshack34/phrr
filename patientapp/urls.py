@@ -2,34 +2,33 @@ from django.urls import path
 from .import views
 urlpatterns = [
     # new
-     path('add_healthcare_speciality/', views.add_healthcare_speciality, name='add_healthcare_speciality'),
-     path('add_healthcare_expert/', views.add_healthcare_expert, name='add_healthcare_expert'),
-     path('view_healthcare_experts/', views.view_healthcare_experts, name='view_healthcare_experts'),
-     path('add_health_insurance/', views.add_health_insurance, name='add_health_insurance'),
-     path('health_insurance/', views.health_insurance_list, name='health_insurance_detail'),
-     path('medical_history/add/', views.add_medical_history, name='add_medical_history'),
-     path('medical_history/<int:medical_history_id>/', views.medical_history_detail, name='medical_history_detail'),
-     path('medical_history/', views.medical_history_list, name='medical_history_list'),
+    path('add_healthcare_speciality/', views.add_healthcare_speciality, name='add_healthcare_speciality'),
+    path('add_healthcare_expert/', views.add_healthcare_expert, name='add_healthcare_expert'),
+    path('view_healthcare_experts/', views.view_healthcare_experts, name='view_healthcare_experts'),
+    path('add_health_insurance/', views.add_health_insurance, name='add_health_insurance'),
+    path('health_insurance/', views.health_insurance_list, name='health_insurance_detail'),
+    path('medical_history/add/', views.add_medical_history, name='add_medical_history'),
+    path('medical_history/<int:medical_history_id>/', views.medical_history_detail, name='medical_history_detail'),
+    path('medical_history/', views.medical_history_list, name='medical_history_list'),
     path('add_lifestyle_details/', views.add_lifestyle_details, name='add_lifestyle_details'),
     path('add_health_goal/', views.add_health_goal, name='add_health_goal'),
     path('display_health_goals/', views.display_health_goals, name='display_health_goals'),
     path('add_emergency_contact/', views.add_emergency_contact, name='add_emergency_contact'),
-    # Other URL patterns...
-
-
-
-
-
   
    
-     
+     #complete order urls
     
     path('',views.home, name='home'),
     path('register/',views.patientregister, name='register'),
     path('patient/dashboard/',views.patient_dashboard, name='patient_dashboard'),
+    path('patients_profile/', views.patients_profile, name='patients_profile'),
+    path('patients_profile/', views.patients_profile, name='patients_profile'),
+    
+
+    path('profile/<int:doctor_id>/', views.profile, name='profile'),
+    
     path('patient_appointment/<int:doctor_id>/', views.patient_appointment, name='patient_appointment'),
     path('appointments/', views.appointments, name="appointments"),
-    path('profile/<int:doctor_id>/', views.profile, name='profile'),
     path('doctor_search/', views.doctor_search, name='doctor_search'),
     path('doctors/',views.doctors, name='doctors'),
     path('booking/<int:doctor_id>/', views.booking, name='booking'),
@@ -73,7 +72,7 @@ urlpatterns = [
     path('viewReview/', views.viewReview, name="viewReview"),
     path('viewReviewOnProfile/', views.viewReviewOnProfile, name="viewReviewOnProfile"),
     path('deleteAppointment/', views.deleteAppointment, name="deleteAppointment"),
-    path('patients_profile/', views.patients_profile, name='patients_profile'),
+    
     path('get_prescription/', views.getPrescription, name="getPrescription"),
     path('show_prescription/', views.show_prescription, name="show_prescription"),
 ]
