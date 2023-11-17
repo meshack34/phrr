@@ -113,6 +113,7 @@ def patients_profile(request):
         'form': form,
     }
     return render(request, 'patients/patients-profile.html', context)
+
 def calculate_age_years(date_of_birth):
     today = date.today()
     if date_of_birth:

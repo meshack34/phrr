@@ -58,26 +58,23 @@
                                         <input type="text" value="{{patient.user.phone_number}}" class="form-control">
                                     </div>
                                 </div>
-
+                              
         
                                 <div class="col-12 col-md-6">
                                     <div class="form-group">
                                         <label>Date of Birth</label>
                                         <div class="">
                                             <input type="date" class="form-control" id="dateOfBirth" name="date_of_birth" value="{{ patient.date_of_birth|date:'Y-m-d' }}">
-                                            
-                                            <span id="ageDisplay">{{ patient.age_years }} years</span>
                                         </div>
                                     </div>
                                 </div>
-                        
                                 <div class="col-12 col-md-6">
                                     <div class="form-group">
                                         <label>Age</label>
-                                        <span id="ageDisplay">{{ patient.age_years }} years</span>
+                                        <input type="text" value="{{ patient.age_years }}" class="form-control" id="ageDisplay" readonly>
                                     </div>
                                 </div>
-                               
+                                
                               
 
                                 <div class="col-12 col-md-6">
