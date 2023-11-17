@@ -493,14 +493,17 @@ class HealthInsurance(models.Model):
         return self.company_name
 
 class MedicalHistory(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='medical_histories')
     condition_name = models.CharField(max_length=100)
     diagnosis_date = models.DateField()
     is_current = models.BooleanField(default=True)
     treatment_records = models.ManyToManyField('TreatmentRecord')
+
     def is_past_condition(self):
         return not self.is_current
 
 class TreatmentRecord(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='treatment_records')
     prescribed_medication = models.CharField(max_length=100)
     dosage = models.CharField(max_length=50)
     start_date = models.DateField()
@@ -511,7 +514,6 @@ class TreatmentRecord(models.Model):
 
     def __str__(self):
         return f"Medication: {self.prescribed_medication}, Start Date: {self.start_date}"
-
 
 
 class HealthGoal(models.Model):

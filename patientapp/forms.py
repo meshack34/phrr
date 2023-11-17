@@ -114,12 +114,23 @@ class HealthInsuranceForm(forms.ModelForm):
         model = HealthInsurance
         fields = '__all__'
         widgets = {}
+        
+class MedicalHistoryyyForm(forms.ModelForm):
+    class Meta:
+        model = MedicalHistory
+        fields = '__all__'
+
+class TreatmentRecordForm(forms.ModelForm):
+    class Meta:
+        model = TreatmentRecord
+        fields = '__all__'
 
 class HealthGoalForm(forms.ModelForm):
     class Meta:
         model = HealthGoal
         fields = '__all__'
 ##################################
+
 class ExerciseForm(forms.ModelForm):
     class Meta:
         model = Exercise
@@ -163,16 +174,6 @@ class HealthcareExpertForm(forms.ModelForm):
         fields = '__all__'
 # insurance_app/forms.py
 
-
-class MedicalHistoryForm(forms.ModelForm):
-    class Meta:
-        model = MedicalHistory
-        fields = ['condition_name', 'diagnosis_date', 'is_current']
-
-class TreatmentRecordForm(forms.ModelForm):
-    class Meta:
-        model = TreatmentRecord
-        fields = ['prescribed_medication', 'dosage', 'start_date', 'end_date', 'monitoring_schedule', 'results']
 
 ##############################################################################################
 

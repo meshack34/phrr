@@ -3,12 +3,9 @@ from .import views
 urlpatterns = [
     # new
     
-    path('medical_history/add/', views.add_medical_history, name='add_medical_history'),
-    path('medical_history/<int:medical_history_id>/', views.medical_history_detail, name='medical_history_detail'),
-    path('medical_history/', views.medical_history_list, name='medical_history_list'),
+    
+    
     path('add_lifestyle_details/', views.add_lifestyle_details, name='add_lifestyle_details'),
-    
-    
     path('manage_emergency_contact/', views.manage_emergency_contact, name='manage_emergency_contact'),
   
   # urls.py
@@ -19,6 +16,16 @@ urlpatterns = [
     
     path('add_health_insurance/', views.add_health_insurance, name='add_health_insurance'),
     path('health_insurance_list/', views.health_insurance_list, name='health_insurance_list'),
+    
+    
+    path('add_medical_history/', views.add_medical_history, name='add_medical_history'),
+    path('medical_history_list/', views.medical_history_list, name='medical_history_list'),
+    path('medical_history_detail/<int:medical_history_id>/', views.medical_history_detail, name='medical_history_detail'),
+    # Add more URLs for other views as needed
+
+    # path('medical_history_detail/<int:medical_history_id>/', views.medical_history_detail, name='medical_history_detail'),
+    
+
    
     path('add_health_goal/', views.add_health_goal, name='add_health_goal'),
     path('health_goal_list/', views.health_goal_list, name='health_goal_list'),
