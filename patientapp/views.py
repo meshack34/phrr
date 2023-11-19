@@ -8,6 +8,11 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login
 from .models import Account, Patient
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import VitalsForm
+from .models import Vitals
+
 from .models import (
     Patient, MedicalHistoryy, DoctorSpecialization, Medication, Doctor,
     EmergencyContact, MedicalHistoryy, Prescription, PrescriptionStatus,
@@ -175,6 +180,40 @@ def manage_emergency_contact(request):
     }
     return render(request, 'patients/manage_emergency_contact.html', context)
 
+##########################
+@login_required(login_url='login')
+def add_vitals(request):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+
+    if request.method == 'POST':
+        form = VitalsForm(request.POST)
+        if form.is_valid():
+            vitals = form.save(commit=False)
+            vitals.patient = current_patient
+            vitals.save()
+            messages.success(request, 'Vitals recorded successfully.')
+            return redirect('view_vitals')
+    else:
+        form = VitalsForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'add_vitals.html', context)
+
+@login_required(login_url='login')
+def view_vitals(request):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    vitals_records = Vitals.objects.filter(patient=current_patient)
+
+    context = {
+        'vitals_records': vitals_records,
+    }
+    return render(request, 'view_vitals.html', context)
+
+############################################################################
 
 def add_lifestyle_details(request):
     current_patient = get_current_patient(request)

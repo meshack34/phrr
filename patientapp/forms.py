@@ -12,7 +12,7 @@ from .models import Exercise, Dietary, Smoking, Alcohol, Medications, Lifestyle,
 from .models import HealthGoal
 from django import forms
 from .models import EmergencyContact
-from django import forms
+from .models import Vitals
 from .models import HealthcareProfessional
       
             
@@ -129,6 +129,13 @@ class HealthGoalForm(forms.ModelForm):
     class Meta:
         model = HealthGoal
         fields = '__all__'
+        
+
+class VitalsForm(forms.ModelForm):
+    class Meta:
+        model = Vitals
+        fields = ['temperature', 'heart_rate', 'blood_pressure_systolic', 'blood_pressure_diastolic', 'respiratory_rate', 'oxygen_saturation']
+
 ##################################
 
 class ExerciseForm(forms.ModelForm):

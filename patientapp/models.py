@@ -151,8 +151,24 @@ class HealthcareProfessional(models.Model):
         verbose_name_plural = 'Healthcare Professionals'
 
 
+# Add these imports to the top of your models.py
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
+class Vitals(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    date_recorded = models.DateTimeField(auto_now_add=True)
+    temperature = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(30), MaxValueValidator(45)])
+    heart_rate = models.PositiveIntegerField(validators=[MinValueValidator(30), MaxValueValidator(200)])
+    blood_pressure_systolic = models.PositiveIntegerField(validators=[MinValueValidator(60), MaxValueValidator(250)])
+    blood_pressure_diastolic = models.PositiveIntegerField(validators=[MinValueValidator(40), MaxValueValidator(150)])
+    respiratory_rate = models.PositiveIntegerField(validators=[MinValueValidator(8), MaxValueValidator(40)])
+    oxygen_saturation = models.PositiveIntegerField(validators=[MinValueValidator(80), MaxValueValidator(100)])
 
+    def __str__(self):
+        return f'Vitals Record for {self.patient.user.username} - {self.date_recorded}'
+
+#####################################
 
 class Doctor(models.Model):
     GENDER_CHOICES = [

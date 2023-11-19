@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Vitals History</h2>
+  {% if vitals_records %}
+    <table>
+      <thead>
+        <tr>
+          <th>Date Recorded</th>
+          <th>Temperature</th>
+          <th>Heart Rate</th>
+          <th>Blood Pressure (Systolic/Diastolic)</th>
+          <th>Respiratory Rate</th>
+          <th>Oxygen Saturation</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in vitals_records %}
+          <tr>
+            <td>{{ record.date_recorded }}</td>
+            <td>{{ record.temperature }}</td>
+            <td>{{ record.heart_rate }}</td>
+            <td>{{ record.blood_pressure_systolic }} / {{ record.blood_pressure_diastolic }}</td>
+            <td>{{ record.respiratory_rate }}</td>
+            <td>{{ record.oxygen_saturation }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No vitals records available.</p>
+  {% endif %}
+{% endblock %}
