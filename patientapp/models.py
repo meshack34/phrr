@@ -10,16 +10,6 @@ from multiselectfield import MultiSelectField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from .models import *
 
-
-class Card(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    description2 = models.TextField(null=True)
-    caption = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.title
-
 class AccountManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
         user = self.model(

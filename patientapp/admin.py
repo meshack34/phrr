@@ -7,7 +7,6 @@ from .models import Doctor, DoctorSpecialization, AppointmentTime,PatientAppoint
 
 
 admin.site.register(Patient)
-admin.site.register(Card)
 admin.site.register(PrescriptionStatus)
 admin.site.register(Doctor)
 admin.site.register(DoctorSpecialization)

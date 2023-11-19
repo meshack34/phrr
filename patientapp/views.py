@@ -11,7 +11,7 @@ from .models import Account, Patient
 from .models import (
     Patient, MedicalHistoryy, DoctorSpecialization, Medication, Doctor,
     EmergencyContact, MedicalHistoryy, Prescription, PrescriptionStatus,
-    AppointmentTime, PatientAppointment, Account, Card, HealthcareProfessional,HealthcareSpecialty,
+    AppointmentTime, PatientAppointment, Account, HealthcareProfessional,HealthcareSpecialty,
     HealthInsurance, TreatmentRecord,
 )
 # views.py
