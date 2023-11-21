@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Your styling here */
+</style>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+
+            {% include 'users/patientsidenav.html' %}
+
+            <div class="col-md-7 col-lg-8 col-xl-9">
+                <div class="card">
+                    <div class="card-body">
+
+                        <h1>View Lifestyle Details</h1>
+                        <!-- Display Lifestyle Details records in a table -->
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Exercise</th>
+                                    <th>Dietary Habits</th>
+                                    <th>Smoking Status</th>
+                                    <th>Alcohol Consumption</th>
+                                    <th>Medications</th>
+                                    <th>Other Lifestyle Details</th>
+                                    <!-- Add more headers based on your model fields -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in lifestyle_records %}
+                                    <tr>
+                                        <td>{{ record.exercise }}</td>
+                                        <td>{{ record.dietary_habits }}</td>
+                                        <td>{{ record.smoking_status }}</td>
+                                        <td>{{ record.alcohol_consumption }}</td>
+                                        <td>{{ record.medications }}</td>
+                                        <td>{{ record.other_details }}</td>
+                                        <!-- Add more cells based on your model fields -->
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

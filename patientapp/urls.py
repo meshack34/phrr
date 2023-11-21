@@ -41,7 +41,8 @@ urlpatterns = [
     path('newview_medical_history/', views.newview_medical_history, name='newview_medical_history'),    
     path('update_medical_history/<int:record_id>/', views.update_medical_history, name='update_medical_history'),
     
- 
+   
+    path('view_lifestyle_details/', views.view_lifestyle_details, name='view_lifestyle_details'),
     
     # path('add_medical_history/', views.add_medical_history, name='add_medical_history'),
     path('add_medical_history/',  views.add_medical_history, name='add_medical_history'),

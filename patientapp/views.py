@@ -542,6 +542,20 @@ def update_medical_history(request, record_id):
 
 ############################################################################
 
+from django.shortcuts import render, redirect
+from .forms import ExerciseForm, DietaryForm, SmokingForm, AlcoholForm, MedicationsForm, LifestyleForm
+  # Import your actual model
+from .utils import get_current_patient  # Import your actual utility function
+
+def view_lifestyle_details(request):
+    current_patient = get_current_patient(request)
+    lifestyle_records = LifestyleDetail.objects.filter(patient=current_patient)
+
+    return render(request, 'view_lifestyle_details.html', {
+        'lifestyle_records': lifestyle_records,
+        'current_patient': current_patient
+    })
+
 def add_lifestyle_details(request):
     current_patient = get_current_patient(request)
 
