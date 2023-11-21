@@ -1,0 +1,11 @@
+<!-- templates/print_vitals.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Vitals Report</h2>
+    <!-- Display vitals_instance details as needed -->
+    <p>Date: {{ vitals_instance.date }}</p>
+    <p>Temperature: {{ vitals_instance.temperature }}</p>
+    <p>Heart Rate: {{ vitals_instance.heart_rate }}</p>
+    <!-- Add more details as needed -->
+{% endblock %}

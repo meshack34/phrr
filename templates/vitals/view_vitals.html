@@ -23,6 +23,13 @@
             <td>{{ record.blood_pressure_systolic }} / {{ record.blood_pressure_diastolic }}</td>
             <td>{{ record.respiratory_rate }}</td>
             <td>{{ record.oxygen_saturation }}</td>
+
+            <td>
+              <a href="{% url 'print_vitals_pdf' record.id %}" target="_blank">Print</a>
+              <a href="{% url 'update_vitals' record.id %}">Update</a>
+              <a href="{% url 'delete_vitals' record.id %}">Delete</a>
+          </td>
+          
           </tr>
         {% endfor %}
       </tbody>

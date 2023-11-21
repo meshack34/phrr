@@ -9,6 +9,9 @@ from django.shortcuts import redirect
 from multiselectfield import MultiSelectField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from .models import *
+# Add these imports to the top of your models.py
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 class AccountManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
@@ -112,15 +115,14 @@ class Patient(models.Model):
 
 class HealthcareSpecialty(models.Model):
     name = models.CharField(max_length=100)
-
     def __str__(self):
         return self.name
-
     class Meta:
         verbose_name = 'Healthcare Specialty'
         verbose_name_plural = 'Healthcare Specialties'
 
 class HealthcareProfessional(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='healthcare_professionals')
     profile_image = models.ImageField(upload_to='healthcare_professionals/%Y/%m/%d/', default='default.png')
     name = models.CharField(max_length=255)
     health_facility = models.CharField(max_length=255)
@@ -140,7 +142,6 @@ class HealthcareProfessional(models.Model):
     patient_reviews = models.TextField()
     professional_memberships = models.TextField()
     additional_notes = models.TextField()
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='healthcare_professionals')
 
 
     def __str__(self):
@@ -150,10 +151,47 @@ class HealthcareProfessional(models.Model):
         verbose_name = 'Healthcare Professional'
         verbose_name_plural = 'Healthcare Professionals'
 
+class Allergy(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    allergy_name = models.CharField(max_length=100)
+    severity = models.CharField(max_length=50)
+    diagnosis_date = models.DateField()
 
-# Add these imports to the top of your models.py
-from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
+    def __str__(self):
+        return f'{self.allergy_name} - {self.severity}'
+    
+class Medication(models.Model):
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    dosage = models.CharField(max_length=50)
+    start_date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.name} - {self.dosage}'
+
+class NewmedicalHistory(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    date_recorded = models.DateTimeField(auto_now_add=True)
+    chief_complaint = models.TextField()
+    present_illness = models.TextField()
+    past_medical_history = models.TextField()
+    allergies = models.ManyToManyField(Allergy, blank=True)
+    medications = models.ManyToManyField(Medication, blank=True)
+    family_history = models.TextField(blank=True, null=True)
+    social_history = models.TextField(blank=True, null=True)
+    
+    # Additional details
+    surgical_history = models.TextField(blank=True, null=True)
+    immunization_history = models.TextField(blank=True, null=True)
+    occupational_history = models.TextField(blank=True, null=True)
+    review_of_systems = models.TextField(blank=True, null=True)
+    physical_examination = models.TextField(blank=True, null=True)
+    lab_results = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f'Medical History for {self.patient.user.username} - {self.date_recorded}'
+
 
 class Vitals(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
@@ -247,11 +285,7 @@ class CurrentMedication(models.Model):
     reason = models.CharField(max_length=200)
     date = models.DateField()
 
-class Allergy(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    allergy_name = models.CharField(max_length=100)
-    severity = models.CharField(max_length=50)
-    diagnosis_date = models.DateField()
+
 
 class Surgery(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
@@ -358,11 +392,7 @@ class Consultation(models.Model):
     def __str__(self):
         return f'{self.name} - {self.price}'
        
-class Medication(models.Model):
-    name = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    def __str__(self):
-        return f'{self.name} - {self.price}'
+
     
 class PaymentType(models.Model):
     name = models.CharField(max_length=255)
@@ -498,6 +528,22 @@ class HealthInsurance(models.Model):
     def __str__(self):
         return self.company_name
 
+
+
+class HealthGoal(models.Model):
+    STATUS_CHOICES = [
+        ('in_progress', 'In Progress'),
+        ('pending', 'Pending'),
+        ('complete', 'Complete'),
+    ]
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='health_goals')
+    goal_description = models.CharField(max_length=200)
+    target_date = models.DateField()
+    progress = models.IntegerField(default=0, help_text="Progress in percentage")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    
 class MedicalHistory(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='medical_histories')
     condition_name = models.CharField(max_length=100)
@@ -520,17 +566,3 @@ class TreatmentRecord(models.Model):
 
     def __str__(self):
         return f"Medication: {self.prescribed_medication}, Start Date: {self.start_date}"
-
-
-class HealthGoal(models.Model):
-    STATUS_CHOICES = [
-        ('in_progress', 'In Progress'),
-        ('pending', 'Pending'),
-        ('complete', 'Complete'),
-    ]
-
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='health_goals')
-    goal_description = models.CharField(max_length=200)
-    target_date = models.DateField()
-    progress = models.IntegerField(default=0, help_text="Progress in percentage")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')

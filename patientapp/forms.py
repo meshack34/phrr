@@ -14,7 +14,44 @@ from django import forms
 from .models import EmergencyContact
 from .models import Vitals
 from .models import HealthcareProfessional
-      
+from django import forms
+from .models import NewmedicalHistory
+from django import forms
+from .models import MedicalHistory, Allergy, Medication
+from django import forms
+from .models import Surgery         
+from django import forms
+from .models import Allergy
+
+
+
+class AllergyForm(forms.ModelForm):
+    class Meta:
+        model = Allergy
+        fields = ['allergy_name', 'severity', 'diagnosis_date']
+
+class MedicationForm(forms.ModelForm):
+    class Meta:
+        model = Medication
+        fields = ['name', 'dosage', 'start_date', 'end_date']
+
+class NEWMedicalHistoryForm(forms.ModelForm):
+    allergies = forms.ModelMultipleChoiceField(
+        queryset=Allergy.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+    medications = forms.ModelMultipleChoiceField(
+        queryset=Medication.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+    class Meta:
+        model = NewmedicalHistory
+        fields = ['chief_complaint', 'present_illness', 'past_medical_history', 'allergies', 'medications', 'family_history', 'social_history', 'surgical_history', 'immunization_history', 'occupational_history', 'review_of_systems', 'physical_examination', 'lab_results']
+
             
 class MedicalTreatmentForm(forms.ModelForm):
     treatment = forms.ModelMultipleChoiceField(queryset=Treatment.objects.all(), widget=forms.CheckboxSelectMultiple)
@@ -91,10 +128,17 @@ class EmergencyContactForm(forms.ModelForm):
 
 
 
+from django import forms
+from .models import HealthcareProfessional, HealthcareSpecialty
+
+
 class HealthcareProfessionalForm(forms.ModelForm):
     class Meta:
         model = HealthcareProfessional
-        fields = '__all__'  # You can specify the fields you want to include if needed
+        fields = ['name', 'health_facility', 'phone', 'email', 'speciality', 'address', 'working_hours',
+                  'education', 'experience_years', 'certifications', 'services_offered', 'languages_spoken',
+                  'emergency_contact', 'insurance_accepted', 'appointment_booking_info', 'patient_reviews',
+                  'professional_memberships', 'additional_notes']
         widgets = {
             'working_hours': forms.TextInput(attrs={'placeholder': 'e.g., Monday-Friday 9 AM - 5 PM'}),
             'education': forms.Textarea(attrs={'placeholder': 'Enter education details here'}),
@@ -107,14 +151,22 @@ class HealthcareProfessionalForm(forms.ModelForm):
             'professional_memberships': forms.Textarea(attrs={'placeholder': 'Enter professional memberships here'}),
             'additional_notes': forms.Textarea(attrs={'placeholder': 'Enter additional notes here'}),
         }
-# models.py
+
+    # Override the default behavior to make only 'name', 'phone', and 'email' mandatory
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].required = True
+        self.fields['phone'].required = True
+        self.fields['email'].required = True
+
 
 class HealthInsuranceForm(forms.ModelForm):
     class Meta:
         model = HealthInsurance
-        fields = '__all__'
-        widgets = {}
-        
+        fields = ['company_name', 'policy_member_id', 'group_number', 'coverage_dates',
+                  'contact_information', 'policy_holder_name', 'policy_holder_relationship',
+                  'insurance_card_image']
+ 
 class MedicalHistoryyyForm(forms.ModelForm):
     class Meta:
         model = MedicalHistory
@@ -124,6 +176,7 @@ class TreatmentRecordForm(forms.ModelForm):
     class Meta:
         model = TreatmentRecord
         fields = '__all__'
+
 
 class HealthGoalForm(forms.ModelForm):
     class Meta:
@@ -250,24 +303,7 @@ class CurrentMedicationForm(forms.ModelForm):
         super(CurrentMedicationForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
-from django import forms
-from .models import Allergy
-
-class AllergyForm(forms.ModelForm):
-    class Meta:
-        model = Allergy
-        fields = [
-            'allergy_name',
-            'severity',
-            'diagnosis_date',
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super(AllergyForm, self).__init__(*args, **kwargs)
-        for field in self.fields:
-            self.fields[field].widget.attrs['class'] = 'form-control'
-from django import forms
-from .models import Surgery
+ 
 
 class SurgeryForm(forms.ModelForm):
     class Meta:

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Medical History</h2>
+  <a href="{% url 'newadd_medical_history' %}">add medical</a>
+  {% if medical_history_records %}
+    <ul>
+      {% for record in medical_history_records %}
+        <li>
+          <strong>Date Recorded:</strong> {{ record.date_recorded }}<br>
+          <strong>Chief Complaint:</strong> {{ record.chief_complaint|linebreaks }}<br>
+          <!-- Add other fields as needed -->
+          <a href="{% url 'update_medical_history' record.id %}">Update</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No medical history records available.</p>
+  {% endif %}
+{% endblock %}

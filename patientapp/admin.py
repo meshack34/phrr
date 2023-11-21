@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import *
 from django.contrib import admin
-from .models import Doctor, DoctorSpecialization, AppointmentTime,PatientAppointment
+from .models import Doctor, DoctorSpecialization, AppointmentTime,PatientAppointment,Allergy
 
 
 
@@ -12,6 +12,8 @@ admin.site.register(Doctor)
 admin.site.register(DoctorSpecialization)
 admin.site.register(AppointmentTime)
 admin.site.register(PatientAppointment)
+admin.site.register(Allergy)
+admin.site.register(NewmedicalHistory)
 
 
 class MedicalHistoryAdmin(admin.ModelAdmin):

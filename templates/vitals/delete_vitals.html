@@ -1,0 +1,11 @@
+<!-- templates/delete_vitals.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Delete Vitals</h2>
+    <p>Are you sure you want to delete these vitals?</p>
+    <form method="post" action="">
+        {% csrf_token %}
+        <button type="submit">Yes, delete</button>
+    </form>
+{% endblock %}

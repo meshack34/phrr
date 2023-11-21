@@ -1,3 +1,7 @@
+
+from django.template.loader import get_template
+from django.http import HttpResponse
+from xhtml2pdf import pisa
 from django.shortcuts import (render, redirect, get_object_or_404,)
 from .models import *
 from django.shortcuts import render, redirect
@@ -12,11 +16,28 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import VitalsForm
 from .models import Vitals
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import NEWMedicalHistoryForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import MedicalHistory, TreatmentRecord, Patient
+from .forms import MedicalHistoryyyForm, TreatmentRecordForm
+from django.contrib.auth.decorators import login_required
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import HealthcareProfessional, Patient
+from .forms import HealthcareProfessionalForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import MedicalHistory, TreatmentRecord, Patient
+from .forms import MedicalHistoryForm, TreatmentRecordForm
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 from .models import (
     Patient, MedicalHistoryy, DoctorSpecialization, Medication, Doctor,
-    EmergencyContact, MedicalHistoryy, Prescription, PrescriptionStatus,
-    AppointmentTime, PatientAppointment, Account, HealthcareProfessional,HealthcareSpecialty,
+    EmergencyContact, MedicalHistoryy, Prescription, PrescriptionStatus,NewmedicalHistory,
+    AppointmentTime, PatientAppointment, Account, HealthcareProfessional,HealthcareSpecialty, 
     HealthInsurance, TreatmentRecord,
 )
 # views.py
@@ -33,7 +54,6 @@ from .forms import (
 )
 from django.shortcuts import render, redirect
 from .models import MedicalHistory, TreatmentRecord, Patient
-from .forms import MedicalHistoryForm, TreatmentRecordForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseBadRequest
@@ -99,16 +119,14 @@ def login(request):
         user = authenticate(email=email, password=password)
         
         if user is not None:
+            
             auth_login(request, user)
             current_user = Account.objects.get(id=request.user.id)
-
-            # Assuming that the user type is determined by the presence of a related Patient object
             patient_exists = Patient.objects.filter(user=current_user).exists()
 
             if patient_exists:
                 return redirect('patient_dashboard')
             else:
-                # Assuming that the user is not a doctor
                 patient = Patient(user=current_user)
                 patient.save()
                 return redirect('patient_dashboard')
@@ -124,7 +142,7 @@ def logout(request):
     messages.success(request, 'You are logged out.')
     return redirect('home')
 
-
+@login_required(login_url='login')
 def patients_profile(request):
     current_user = request.user
     current_patient = Patient.objects.get(user=current_user)
@@ -153,8 +171,7 @@ def calculate_age_years(date_of_birth):
     return None
 
 
-
-
+@login_required(login_url='login')
 def manage_emergency_contact(request):
     current_user = request.user
     try:
@@ -180,7 +197,204 @@ def manage_emergency_contact(request):
     }
     return render(request, 'patients/manage_emergency_contact.html', context)
 
-##########################
+#Health speciality
+@login_required(login_url='login')
+def add_healthcare_speciality(request):
+    existing_specialities = HealthcareSpecialty.objects.all()
+    if request.method == 'POST':
+        form = HealthcareSpecialityForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('add_healthcare_speciality')  
+    else:
+        form = HealthcareSpecialityForm()
+    return render(request, 'speciality/add_healthcare_speciality.html', {'form': form, 'existing_specialities': existing_specialities})
+from django.shortcuts import get_object_or_404
+
+@login_required(login_url='login')
+def update_healthcare_speciality(request, pk):
+    healthcare_specialty = get_object_or_404(HealthcareSpecialty, pk=pk)
+    existing_specialities = HealthcareSpecialty.objects.all()
+
+    if request.method == 'POST':
+        form = HealthcareSpecialityForm(request.POST, instance=healthcare_specialty)
+        if form.is_valid():
+            form.save()
+            return redirect('add_healthcare_speciality')  
+    else:
+        form = HealthcareSpecialityForm(instance=healthcare_specialty)
+
+    return render(request, 'speciality/update_healthcare_speciality.html', {'form': form, 'speciality': healthcare_specialty, 'existing_specialities': existing_specialities})
+
+
+@login_required(login_url='login')
+def delete_healthcare_speciality(request, pk):
+    healthcare_specialty = get_object_or_404(HealthcareSpecialty, pk=pk)
+
+    if request.method == 'POST':
+        healthcare_specialty.delete()
+        return redirect('add_healthcare_speciality')
+
+    return render(request, 'speciality/delete_healthcare_speciality.html', {'healthcare_specialty': healthcare_specialty})
+
+######## end specilization
+########
+
+
+@login_required(login_url='login')
+def add_healthcare_professional(request):
+    current_user = request.user
+    if request.method == 'POST':
+        form = HealthcareProfessionalForm(request.POST)
+        if form.is_valid():
+            healthcare_professional = form.save(commit=False)
+            
+            try:
+                # Attempt to get the patient associated with the current user
+                patient = Patient.objects.get(user=current_user)
+                healthcare_professional.patient = patient
+                healthcare_professional.save()
+                messages.success(request, 'Healthcare professional added successfully.')
+                return redirect('healthcare_professionals')
+            
+            except Patient.DoesNotExist:
+                # Handle the case where the patient is not found for the current user
+                messages.error(request, 'Patient not found. Please make sure your account is associated with a patient.')
+                return redirect('add_healthcare_professional')
+
+    else:
+        form = HealthcareProfessionalForm()
+
+    return render(request, 'speciality/add_healthcare_professional.html', {'form': form})
+
+
+# views.py
+@login_required(login_url='login')
+def healthcare_professionals(request):
+    if request.user.is_authenticated:
+        patient = Patient.objects.get(user=request.user)
+        professionals = patient.healthcare_professionals.all()
+
+        context = {'professionals': professionals}
+        return render(request, 'speciality/healthcare_professionals.html', context)
+    else:
+        return redirect('login')
+
+################################end health care professional
+# views.py
+
+@login_required(login_url='login')
+def add_health_insurance(request):
+    current_user = request.user
+    try:
+        # Attempt to get the patient associated with the current user
+        patient = Patient.objects.get(user=current_user)
+        
+        if request.method == 'POST':
+            form = HealthInsuranceForm(request.POST, request.FILES)
+            if form.is_valid():
+                health_insurance = form.save(commit=False)
+                health_insurance.patient = patient
+                health_insurance.save()
+                messages.success(request, 'Health insurance information added successfully.')
+                return redirect('health_insurance_list')
+
+        else:
+            form = HealthInsuranceForm()
+
+        return render(request, 'add_health_insurance.html', {'form': form})
+    
+    except Patient.DoesNotExist:
+        # Handle the case where the patient is not found for the current user
+        messages.error(request, 'Patient not found. Please make sure your account is associated with a patient.')
+        return redirect('add_health_insurance')
+
+# views.py
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import HealthInsurance
+from .forms import HealthInsuranceForm
+from .models import Patient
+
+@login_required(login_url='login')
+def view_health_insurance(request):
+    current_user = request.user
+
+    try:
+        # Attempt to get the patient associated with the current user
+        patient = Patient.objects.get(user=current_user)
+
+        # Use filter() to get a queryset of health insurances associated with the patient
+        health_insurances = HealthInsurance.objects.filter(patient=patient)
+
+        # Check if any health insurances were found
+        if health_insurances.exists():
+            # Use the first health insurance entry (you might want to implement logic to handle multiple entries)
+            health_insurance = health_insurances.first()
+
+            return render(request, 'healthinsurance/health_insurance_list.html.html', {'health_insurance': health_insurance})
+        
+        else:
+            # Handle the case where no health insurance entry is found
+            messages.error(request, 'No health insurance information found.')
+            return redirect('add_health_insurance')
+
+    except Patient.DoesNotExist:
+        # Handle the case where the patient is not found for the current user
+        messages.error(request, 'Patient not found. Please make sure your account is associated with a patient.')
+        return redirect('add_health_insurance')
+
+
+# @login_required(login_url='login')
+
+# def view_health_insurance(request):
+#     current_user = request.user
+#     try:
+#         patient = Patient.objects.get(user=current_user)
+        
+#         health_insurance = HealthInsurance.objects.get(patient=patient)
+
+#         return render(request, 'healthinsurance/view_health_insurance.html', {'health_insurance': health_insurance})
+    
+#     except (Patient.DoesNotExist, HealthInsurance.DoesNotExist):
+#         messages.error(request, 'Patient or health insurance not found.')
+#         return redirect('healthinsurance/add_health_insurance')
+
+# def add_health_insurance(request):
+#     if request.user.is_authenticated:
+#         patient = Patient.objects.get(user=request.user)
+
+#         if request.method == 'POST':
+#             form = HealthInsuranceForm(request.POST, request.FILES)
+#             if form.is_valid():
+#                 insurance = form.save(commit=False)
+#                 insurance.patient = patient
+#                 insurance.save()
+#                 return redirect('health_insurance_list')
+#         else:
+#             form = HealthInsuranceForm()
+
+#         context = {'form': form}
+#         return render(request, 'add_health_insurance.html', context)
+#     else:
+#         # Handle unauthenticated user
+#         return redirect('login')
+    
+def health_insurance_list(request):
+    if request.user.is_authenticated:
+        patient = Patient.objects.get(user=request.user)
+        health_insurances = patient.health_insurances.all()
+
+        context = {'health_insurances': health_insurances}
+        return render(request, 'health_insurance_list.html', context)
+    else:
+        # Handle unauthenticated user
+        return redirect('login')
+
+
+
+#########################add vitals
 @login_required(login_url='login')
 def add_vitals(request):
     current_user = request.user
@@ -200,7 +414,7 @@ def add_vitals(request):
     context = {
         'form': form,
     }
-    return render(request, 'add_vitals.html', context)
+    return render(request, 'vitals/add_vitals.html', context)
 
 @login_required(login_url='login')
 def view_vitals(request):
@@ -211,7 +425,120 @@ def view_vitals(request):
     context = {
         'vitals_records': vitals_records,
     }
-    return render(request, 'view_vitals.html', context)
+    return render(request, 'vitals/view_vitals.html', context)
+
+@login_required(login_url='login')
+def update_vitals(request, vitals_id):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    vitals_instance = get_object_or_404(Vitals, id=vitals_id, patient=current_patient)
+
+    if request.method == 'POST':
+        form = VitalsForm(request.POST, instance=vitals_instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Vitals updated successfully.')
+            return redirect('view_vitals')
+    else:
+        form = VitalsForm(instance=vitals_instance)
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'vitals.update_vitals.html', context)
+
+@login_required(login_url='login')
+def delete_vitals(request, vitals_id):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    vitals_instance = get_object_or_404(Vitals, id=vitals_id, patient=current_patient)
+
+    if request.method == 'POST':
+        vitals_instance.delete()
+        messages.success(request, 'Vitals deleted successfully.')
+        return redirect('view_vitals')
+
+    context = {
+        'vitals_instance': vitals_instance,
+    }
+    return render(request, 'vitals/delete_vitals.html', context)
+
+@login_required(login_url='login')
+def print_vitals_pdf(request, vitals_id):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    vitals_instance = get_object_or_404(Vitals, id=vitals_id, patient=current_patient)
+
+    template_path = 'print_vitals.html'
+    context = {'vitals_instance': vitals_instance}
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="vitals_report.pdf"'
+
+    # Create the PDF object, using the template and context
+    template = get_template(template_path)
+    html = template.render(context)
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    # If error during PDF creation, return the error message
+    if pisa_status.err:
+        return HttpResponse('Error creating PDF')
+    return response
+
+###################################
+################  end vitals 
+@login_required(login_url='login')
+def newadd_medical_history(request):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+
+    if request.method == 'POST':
+        form = NEWMedicalHistoryForm(request.POST)
+        if form.is_valid():
+            medical_history = form.save(commit=False)
+            medical_history.patient = current_patient
+            medical_history.save()
+            messages.success(request, 'Medical history recorded successfully.')
+            return redirect('newview_medical_history')
+    else:
+        form = NEWMedicalHistoryForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'medicalhistory/add_medical_historyy.html', context)
+
+@login_required(login_url='login')
+def newview_medical_history(request):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    medical_history_records = NewmedicalHistory.objects.filter(patient=current_patient)
+    print([record.id for record in medical_history_records])  # Add this line
+
+    context = {
+        'medical_history_records': medical_history_records,
+    }
+    return render(request, 'medicalhistory/view_medical_history.html', context)
+
+@login_required(login_url='login')
+def update_medical_history(request, record_id):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    medical_record = get_object_or_404(NewmedicalHistory, id=record_id, patient=current_patient)
+
+    if request.method == 'POST':
+        form = NEWMedicalHistoryForm(request.POST, instance=medical_record)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Medical history updated successfully.')
+            return redirect('newview_medical_history')
+    else:
+        form = NEWMedicalHistoryForm(instance=medical_record)
+
+    context = {
+        'form': form,
+        'record_id': record_id,
+    }
+    return render(request, 'medicalhistory/update_medical_history.html', context)
 
 ############################################################################
 
@@ -267,249 +594,238 @@ def add_lifestyle_details(request):
     })
 
 
-def add_healthcare_professional(request):
-    if request.user.is_authenticated:
-        patient = Patient.objects.get(user=request.user)
-
-        if request.method == 'POST':
-            form = HealthcareProfessionalForm(request.POST)
-            if form.is_valid():
-                professional = form.save(commit=False)
-                professional.patient = patient
-                professional.save()
-                return redirect('healthcare_professionals')
-        else:
-            form = HealthcareProfessionalForm()
-
-        context = {'form': form}
-        return render(request, 'add_healthcare_professional.html', context)
-    else:
-        # Handle unauthenticated user
-        return redirect('login')
-
-
 # views.py
-def healthcare_professionals(request):
-    if request.user.is_authenticated:
-        patient = Patient.objects.get(user=request.user)
-        professionals = patient.healthcare_professionals.all()
-
-        context = {'professionals': professionals}
-        return render(request, 'healthcare_professionals.html', context)
-    else:
-        # Handle unauthenticated user
-        return redirect('login')
-
-
-def add_healthcare_speciality(request):
-    existing_specialities = HealthcareSpecialty.objects.all()
-    if request.method == 'POST':
-        form = HealthcareSpecialityForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('add_healthcare_speciality')  
-    else:
-        form = HealthcareSpecialityForm()
-    return render(request, 'add_healthcare_speciality.html', {'form': form, 'existing_specialities': existing_specialities})
-
-# views.py
-
-
-def add_health_insurance(request):
-    if request.user.is_authenticated:
-        patient = Patient.objects.get(user=request.user)
-
-        if request.method == 'POST':
-            form = HealthInsuranceForm(request.POST, request.FILES)
-            if form.is_valid():
-                insurance = form.save(commit=False)
-                insurance.patient = patient
-                insurance.save()
-                return redirect('health_insurance_list')
-        else:
-            form = HealthInsuranceForm()
-
-        context = {'form': form}
-        return render(request, 'add_health_insurance.html', context)
-    else:
-        # Handle unauthenticated user
-        return redirect('login')
-    
-def health_insurance_list(request):
-    if request.user.is_authenticated:
-        patient = Patient.objects.get(user=request.user)
-        health_insurances = patient.health_insurances.all()
-
-        context = {'health_insurances': health_insurances}
-        return render(request, 'health_insurance_list.html', context)
-    else:
-        # Handle unauthenticated user
-        return redirect('login')
-
-# views.py
-
-# views.py
-
-
-# from django.shortcuts import render, redirect, get_object_or_404
-# from .models import MedicalHistory, TreatmentRecord
-# from .forms import MedicalHistoryForm, TreatmentRecordForm
-# from django.contrib.auth.decorators import login_required
-
-# @login_required
-# def add_medical_history(request):
-#     if request.method == 'POST':
-#         form = MedicalHistoryForm(request.POST)
-#         if form.is_valid():
-#             medical_history = form.save(commit=False)
-#             medical_history.patient = request.user.patient
-#             medical_history.save()
-#             return redirect('medical_history_list')
-#     else:
-#         form = MedicalHistoryForm()
-
-#     treatment_form = TreatmentRecordForm()
-#     medical_histories = request.user.patient.medical_histories.all()
-#     treatment_records = request.user.patient.treatment_records.all()
-
-#     context = {'form': form, 'treatment_form': treatment_form, 'medical_histories': medical_histories, 'treatment_records': treatment_records}
-#     return render(request, 'medical_history_and_treatment.html', context)
-
-# @login_required
-# def add_treatment_record(request):
-#     if request.method == 'POST':
-#         form = TreatmentRecordForm(request.POST)
-#         if form.is_valid():
-#             treatment_record = form.save(commit=False)
-#             treatment_record.patient = request.user.patient
-#             treatment_record.save()
-#             return redirect('medical_history_list')  # Redirect to the medical history list after adding a treatment record
-#     else:
-#         form = TreatmentRecordForm()
-
-#     medical_history_form = MedicalHistoryForm()
-#     medical_histories = request.user.patient.medical_histories.all()
-#     treatment_records = request.user.patient.treatment_records.all()
-
-#     context = {'form': form, 'medical_history_form': medical_history_form, 'medical_histories': medical_histories, 'treatment_records': treatment_records}
-#     return render(request, 'medical_history_and_treatment.html', context)
-
-# @login_required
-# def medical_history_list(request):
-#     patient = request.user.patient  # Assuming user is authenticated and has a related Patient
-#     medical_histories = patient.medical_histories.all()
-#     context = {'medical_histories': medical_histories}
-#     return render(request, 'medical_history_list.html', context)
-
-
-# @login_required
-# def medical_history_detail(request, medical_history_id):
-#     medical_history = get_object_or_404(MedicalHistory, id=medical_history_id)
-#     treatment_records = medical_history.treatment_records.all()
-
-#     context = {'medical_history': medical_history, 'treatment_records': treatment_records}
-#     return render(request, 'medical_history_detail.html', context)
-
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import MedicalHistory, TreatmentRecord, Patient
-from .forms import MedicalHistoryyyForm, TreatmentRecordForm
-from django.contrib.auth.decorators import login_required
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import MedicalHistory, TreatmentRecord, Patient
-from .forms import MedicalHistoryForm, TreatmentRecordForm
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from .models import MedicalHistory, TreatmentRecord
+from .forms import MedicalHistoryyyForm, TreatmentRecordForm
+from .models import Patient  # Adjust the import as needed
 
-# @login_required
-# def add_medical_history(request):
-#     if request.user.is_authenticated:
-#         try:
-#             patient = request.user.patient  # Try to get the patient associated with the user
-#         except Patient.DoesNotExist:
-#             return HttpResponse("You need to create a patient profile.")
-
-#         print(request.user)  # Check if the user is printed in the console
-#         print(patient)  # Check if the related Patient is printed
-
-#         if request.method == 'POST':
-#             form = MedicalHistoryForm(request.POST)
-#             if form.is_valid():
-#                 medical_history = form.save(commit=False)
-#                 medical_history.patient = patient
-#                 medical_history.save()
-#                 return redirect('medical_history_list')
-#         else:
-#             form = MedicalHistoryForm()
-
-#         treatment_form = TreatmentRecordForm()
-#         medical_histories = patient.medical_histories.all()
-#         treatment_records = patient.treatment_records.all()
-
-#         context = {'form': form, 'treatment_form': treatment_form, 'medical_histories': medical_histories, 'treatment_records': treatment_records}
-#         return render(request, 'medical_history_and_treatment.html', context)
-#     else:
-#         # Handle unauthenticated user
-#         return redirect('login')
-
-
-# @login_required
-# def add_treatment_record(request):
-#     if request.method == 'POST':
-#         form = TreatmentRecordForm(request.POST)
-#         if form.is_valid():
-#             treatment_record = form.save(commit=False)
-#             treatment_record.patient = request.user.patient
-#             treatment_record.save()
-#             return redirect('medical_history_list')  # Redirect to the medical history list after adding a treatment record
-#     else:
-#         form = TreatmentRecordForm()
-
-#     medical_history_form = MedicalHistoryForm()
-#     medical_histories = request.user.patient.medical_histories.all()
-#     treatment_records = request.user.patient.treatment_records.all()
-
-#     context = {'form': form, 'medical_history_form': medical_history_form, 'medical_histories': medical_histories, 'treatment_records': treatment_records}
-#     return render(request, 'medical_history_and_treatment.html', context)
-
-# @login_required
-# def medical_history_list(request):
-#     # Ensure that the authenticated user is a patient and has a related patient object
-#     if hasattr(request.user, 'patient') and request.user.patient:
-#         medical_histories = request.user.patient.medical_histories.all()
-#         context = {'medical_histories': medical_histories}
-#         return render(request, 'medical_history_list.html', context)
-#     else:
-#         # Handle the case where the authenticated user is not associated with a patient
-#         return redirect('login')  # Or redirect to another appropriate view
-
-
+@login_required(login_url='login')
 def add_medical_history(request):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+
     if request.method == 'POST':
-        medical_history_form = MedicalHistoryyyForm(request.POST)
-        treatment_record_form = TreatmentRecordForm(request.POST)
-
-        if medical_history_form.is_valid() and treatment_record_form.is_valid():
-            medical_history = medical_history_form.save(commit=False)
-            treatment_record = treatment_record_form.save()
+        form = MedicalHistoryyyForm(request.POST)
+        if form.is_valid():
+            medical_history = form.save(commit=False)
+            medical_history.patient = current_patient
             medical_history.save()
-            medical_history.treatment_records.add(treatment_record)
-
-            return redirect('medical_history_list') 
+            messages.success(request, 'Medical history added successfully.')
+            return redirect('view_medical_history')
     else:
-        medical_history_form = MedicalHistoryyyForm()
-        treatment_record_form = TreatmentRecordForm()
+        form = MedicalHistoryyyForm()
 
-    return render(request, 'add_medical_history.html', {'medical_history_form': medical_history_form, 'treatment_record_form': treatment_record_form})
+    context = {
+        'form': form,
+    }
+    return render(request, 'medical_history/add_medical_history.html', context)
 
-def medical_history_detail(request, medical_history_id):
-    medical_history = get_object_or_404(MedicalHistory, pk=medical_history_id)
-    return render(request, 'medical_history_detail.html', {'medical_history': medical_history})
+@login_required(login_url='login')
+def view_medical_history(request):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    medical_history_records = MedicalHistory.objects.filter(patient=current_patient)
 
-def medical_history_list(request):
-    medical_histories = MedicalHistory.objects.all()
-    return render(request, 'medical_history_list.html', {'medical_histories': medical_histories})
+    context = {
+        'medical_history_records': medical_history_records,
+    }
+    return render(request, 'medical_history/view_medical_history.html', context)
 
+
+# @login_required(login_url='login')
+# def view_medical_history(request):
+#     current_user = request.user
+#     current_patient = Patient.objects.get(user=current_user)
+#     medical_history_records = MedicalHistory.objects.filter(patient=current_patient)
+
+#     context = {
+#         'medical_history_records': medical_history_records,
+#     }
+#     return render(request, 'medical_history/view_medical_history.html', context)
+
+@login_required(login_url='login')
+def update_medical_history(request, medical_history_id):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    medical_history_instance = get_object_or_404(MedicalHistory, id=medical_history_id, patient=current_patient)
+
+    if request.method == 'POST':
+        form = MedicalHistoryyyForm(request.POST, instance=medical_history_instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Medical history updated successfully.')
+            return redirect('view_medical_history')
+    else:
+        form = MedicalHistoryyyForm(instance=medical_history_instance)
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'medical_history/update_medical_history.html', context)
+
+@login_required(login_url='login')
+def delete_medical_history(request, medical_history_id):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    medical_history_instance = get_object_or_404(MedicalHistory, id=medical_history_id, patient=current_patient)
+
+    if request.method == 'POST':
+        medical_history_instance.delete()
+        messages.success(request, 'Medical history deleted successfully.')
+        return redirect('view_medical_history')
+
+    context = {
+        'medical_history_instance': medical_history_instance,
+    }
+    return render(request, 'medical_history/delete_medical_history.html', context)
+
+@login_required(login_url='login')
+def print_medical_history_pdf(request, medical_history_id):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    medical_history_instance = get_object_or_404(MedicalHistory, id=medical_history_id, patient=current_patient)
+
+    template_path = 'print_medical_history.html'
+    context = {'medical_history_instance': medical_history_instance}
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="medical_history_report.pdf"'
+
+    # Create the PDF object, using the template and context
+    template = get_template(template_path)
+    html = template.render(context)
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    # If error during PDF creation, return the error message
+    if pisa_status.err:
+        return HttpResponse('Error creating PDF')
+    return response
+# views.py
+############################################
+@login_required(login_url='login')
+def add_treatment_record(request):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+
+    if request.method == 'POST':
+        form = TreatmentRecordForm(request.POST)
+        if form.is_valid():
+            treatment_record = form.save(commit=False)
+            treatment_record.patient = current_patient
+            treatment_record.save()
+            messages.success(request, 'Treatment record added successfully.')
+            return redirect('view_treatment_records')
+    else:
+        form = TreatmentRecordForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'treatment_records/add_treatment_record.html', context)
+
+@login_required(login_url='login')
+def view_treatment_records(request):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    treatment_records = TreatmentRecord.objects.filter(patient=current_patient)
+
+    context = {
+        'treatment_records': treatment_records,
+    }
+    return render(request, 'treatment_records/view_treatment_records.html', context)
+
+@login_required(login_url='login')
+def update_treatment_record(request, treatment_record_id):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    treatment_record_instance = get_object_or_404(TreatmentRecord, id=treatment_record_id, patient=current_patient)
+
+    if request.method == 'POST':
+        form = TreatmentRecordForm(request.POST, instance=treatment_record_instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Treatment record updated successfully.')
+            return redirect('view_treatment_records')
+    else:
+        form = TreatmentRecordForm(instance=treatment_record_instance)
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'treatment_records/update_treatment_record.html', context)
+
+@login_required(login_url='login')
+def delete_treatment_record(request, treatment_record_id):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    treatment_record_instance = get_object_or_404(TreatmentRecord, id=treatment_record_id, patient=current_patient)
+
+    if request.method == 'POST':
+        treatment_record_instance.delete()
+        messages.success(request, 'Treatment record deleted successfully.')
+        return redirect('view_treatment_records')
+
+    context = {
+        'treatment_record_instance': treatment_record_instance,
+    }
+    return render(request, 'treatment_records/delete_treatment_record.html', context)
+
+@login_required(login_url='login')
+def print_treatment_record_pdf(request, treatment_record_id):
+    current_user = request.user
+    current_patient = Patient.objects.get(user=current_user)
+    treatment_record_instance = get_object_or_404(TreatmentRecord, id=treatment_record_id, patient=current_patient)
+
+    template_path = 'print_treatment_record.html'
+    context = {'treatment_record_instance': treatment_record_instance}
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="treatment_record_report.pdf"'
+
+    # Create the PDF object, using the template and context
+    template = get_template(template_path)
+    html = template.render(context)
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    # If error during PDF creation, return the error message
+    if pisa_status.err:
+        return HttpResponse('Error creating PDF')
+    return response
+
+# Similar views for TreatmentRecord (add, view, update, delete, and print)
+# Make sure to adjust the model, form, and template names accordingly.
+
+
+# def add_medical_history(request):
+#     if request.method == 'POST':
+#         medical_history_form = MedicalHistoryyyForm(request.POST)
+#         treatment_record_form = TreatmentRecordForm(request.POST)
+
+#         if medical_history_form.is_valid() and treatment_record_form.is_valid():
+#             medical_history = medical_history_form.save(commit=False)
+#             treatment_record = treatment_record_form.save()
+#             medical_history.save()
+#             medical_history.treatment_records.add(treatment_record)
+
+#             return redirect('medical_history_list') 
+#     else:
+#         medical_history_form = MedicalHistoryyyForm()
+#         treatment_record_form = TreatmentRecordForm()
+
+#     return render(request, 'medicalhistory/add_medical_history.html', {'medical_history_form': medical_history_form, 'treatment_record_form': treatment_record_form})
+
+# def medical_history_detail(request, medical_history_id):
+#     medical_history = get_object_or_404(MedicalHistory, pk=medical_history_id)
+#     return render(request, 'medicalhistory/medical_history_detail.html', {'medical_history': medical_history})
+
+# def medical_history_list(request):
+#     medical_histories = MedicalHistory.objects.all()
+#     return render(request, 'medicalhistory/medical_history_list.html', {'medical_histories': medical_histories})
+##################################33
 
 def add_health_goal(request):
     if request.user.is_authenticated:
@@ -526,18 +842,18 @@ def add_health_goal(request):
             form = HealthGoalForm()
 
         context = {'form': form}
-        return render(request, 'add_health_goal.html', context)
+        return render(request, 'goals/add_health_goal.html', context)
     else:
         # Handle unauthenticated user
         return redirect('login')
-
+###################################################
 def health_goal_list(request):
     if request.user.is_authenticated:
         patient = Patient.objects.get(user=request.user)
         health_goals = patient.health_goals.all()
 
         context = {'health_goals': health_goals}
-        return render(request, 'display_health_goals.html', context)
+        return render(request, 'goals/display_health_goals.html', context)
     else:
         # Handle unauthenticated user
         return redirect('login')
@@ -1329,31 +1645,7 @@ def Medication(request, patient_id):
 #         # Handle the case where the doctor does not exist
 #         return HttpResponseBadRequest("Doctor not found")
 
-from django.shortcuts import render, get_object_or_404
-from .models import Patient, MedicalHistoryy
 
-from django.shortcuts import render, get_object_or_404
-from .models import Patient, Medical_History  # Update the model import
-
-def view_medical_history(request, patient_id):
-    # Get the patient object or return a 404 page if not found
-    patient = get_object_or_404(Patient, id=patient_id)
-    medical_history = Medical_History.objects.filter(patient=patient)
-
-    context = {
-        'patient': patient,
-        'medical_history': medical_history,
-    }
-
-    return render(request, 'documents/view_medical_history.html', context)
-
-
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseBadRequest
-from io import BytesIO
-from reportlab.pdfgen import canvas
-from django.http import FileResponse
-from .models import Patient, Medical_History  # Update the import for the model
 
 def generate_medical_treatment_pdf(request, patient_id):
     try:

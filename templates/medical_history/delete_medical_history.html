@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Your styling here */
+</style>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+
+            {% include 'users/patientsidenav.html' %}
+
+            <div class="col-md-7 col-lg-8 col-xl-9">
+                <div class="card">
+                    <div class="card-body">
+
+                        <h1>Delete Medical History</h1>
+                        <p>Are you sure you want to delete the following medical history?</p>
+                        <p>{{ medical_history_instance.condition_name }} - {{ medical_history_instance.diagnosis_date }}</p>
+
+                        <!-- Medical History Deletion Form -->
+                        <form action="{% url 'delete_medical_history' medical_history_instance.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <a href="{% url 'view_medical_history' %}" class="btn btn-secondary">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

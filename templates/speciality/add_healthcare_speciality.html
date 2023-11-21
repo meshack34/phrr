@@ -85,6 +85,7 @@
                 <tr>
                   <th>#</th>
                   <th>Name</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -92,6 +93,15 @@
                   <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ speciality.name }}</td>
+                  <td>
+                    <a href="{% url 'update_healthcare_speciality' speciality.pk %}" class="btn btn-link">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'delete_healthcare_speciality' speciality.pk %}" class="btn btn-link text-danger">
+                      <i class="fas fa-trash-alt"></i>
+                    </a>
+                  </td>
+                  
                   </tr>
                 {% endfor %}
               </tbody>

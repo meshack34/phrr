@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Your styling here */
+</style>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+
+            {% include 'users/patientsidenav.html' %}
+
+            <div class="col-md-7 col-lg-8 col-xl-9">
+                <div class="card">
+                    <div class="card-body">
+
+                        <h1>View Treatment Records</h1>
+                        <!-- Display Treatment Record records -->
+                        {% for record in treatment_records %}     
+                            <!-- Customize the display based on your model fields -->
+                            <p>{{ record.prescribed_medication }} - {{ record.start_date }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
