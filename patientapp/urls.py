@@ -10,7 +10,6 @@ urlpatterns = [
     
     
     
-    path('add_lifestyle_details/', views.add_lifestyle_details, name='add_lifestyle_details'),
     path('manage_emergency_contact/', views.manage_emergency_contact, name='manage_emergency_contact'),
     
     path('add/', views.add_healthcare_speciality, name='add_healthcare_speciality'),
@@ -42,7 +41,12 @@ urlpatterns = [
     path('update_medical_history/<int:record_id>/', views.update_medical_history, name='update_medical_history'),
     
    
+    # path('view_lifestyle_details/', views.view_lifestyle_details, name='view_lifestyle_details'),
+    
+    path('add_lifestyle_details/', views.add_lifestyle_details, name='add_lifestyle_details'),
     path('view_lifestyle_details/', views.view_lifestyle_details, name='view_lifestyle_details'),
+
+
     
     # path('add_medical_history/', views.add_medical_history, name='add_medical_history'),
     path('add_medical_history/',  views.add_medical_history, name='add_medical_history'),

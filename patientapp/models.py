@@ -464,19 +464,19 @@ class LabReport(models.Model):
 
 
 class Exercise(models.Model):
-    patient = models.OneToOneField(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     exercise_type = models.CharField(max_length=50, blank=True, null=True)
     exercise_duration = models.IntegerField(blank=True, null=True)
     exercise_frequency = models.CharField(max_length=50, blank=True, null=True)
 
 class Dietary(models.Model):
-    patient = models.OneToOneField(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     dietary_preferences = models.CharField(max_length=50, blank=True, null=True)
     food_allergies = models.CharField(max_length=100, blank=True, null=True)
     balanced_diet = models.TextField(blank=True, null=True)
 
 class Smoking(models.Model):
-    patient = models.OneToOneField(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     SMOKING_STATUS_CHOICES = [
         ('current', 'Current'),
         ('former', 'Former'),
@@ -496,20 +496,20 @@ class Smoking(models.Model):
         return f"Patient: {self.patient}, Smoking Status: {self.smoking_status}"
 
 class Alcohol(models.Model):
-    patient = models.OneToOneField(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     alcohol_consumption = models.BooleanField(default=False)
     alcohol_frequency = models.CharField(max_length=20, blank=True, null=True)
     alcohol_types = models.CharField(max_length=100, blank=True, null=True)
     alcohol_units_per_week = models.IntegerField(blank=True, null=True)
 
 class Medications(models.Model):
-    patient = models.OneToOneField(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     medications = models.CharField(max_length=50, blank=True, null=True)
     medication_dosage = models.CharField(max_length=50, blank=True, null=True)
     medication_instructions = models.TextField(blank=True, null=True)
 
 class Lifestyle(models.Model):
-    patient = models.OneToOneField(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     occupational_exposures = models.TextField(blank=True, null=True)
 
 

@@ -191,6 +191,13 @@ class VitalsForm(forms.ModelForm):
 
 ##################################
 
+# forms.py
+
+# forms.py
+
+from django import forms
+from .models import Exercise, Dietary, Smoking, Alcohol, Medications, Lifestyle
+
 class ExerciseForm(forms.ModelForm):
     class Meta:
         model = Exercise
@@ -221,6 +228,8 @@ class LifestyleForm(forms.ModelForm):
         model = Lifestyle
         fields = ['occupational_exposures']
 
+
+#######################
 
 class HealthcareSpecialityForm(forms.ModelForm):
     class Meta:

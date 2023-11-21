@@ -82,6 +82,7 @@
                     <th>Phone</th>
                     <th>Email</th>
                     <th>Speciality</th>
+                    <th>Action</th>
                     <th>View</th>
                     
                   </tr>
@@ -96,8 +97,14 @@
                       <td>{{ professional.phone }}</td>
                       <td>{{ professional.email }}</td>
                       <td>{{ professional.speciality }}</td>
+                      <td>
+                        <a href="#" target="_blank"><i class="fas fa-print"></i></a>
+                        <a href="#"><i class="fas fa-edit"></i> </a>
+                        <a href="#"> <i class="fas fa-trash-alt"></i></a>
+
+                    </td>
                       <td> <a href="#">
-                        <i class="fas fa-plus-circle"></i> view details
+                        <i class="fas fa-plus-circle"></i> more details
                       </a></td>
                     </tr>
                   {% endfor %}

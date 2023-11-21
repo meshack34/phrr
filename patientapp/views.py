@@ -346,40 +346,6 @@ def view_health_insurance(request):
         return redirect('add_health_insurance')
 
 
-# @login_required(login_url='login')
-
-# def view_health_insurance(request):
-#     current_user = request.user
-#     try:
-#         patient = Patient.objects.get(user=current_user)
-        
-#         health_insurance = HealthInsurance.objects.get(patient=patient)
-
-#         return render(request, 'healthinsurance/view_health_insurance.html', {'health_insurance': health_insurance})
-    
-#     except (Patient.DoesNotExist, HealthInsurance.DoesNotExist):
-#         messages.error(request, 'Patient or health insurance not found.')
-#         return redirect('healthinsurance/add_health_insurance')
-
-# def add_health_insurance(request):
-#     if request.user.is_authenticated:
-#         patient = Patient.objects.get(user=request.user)
-
-#         if request.method == 'POST':
-#             form = HealthInsuranceForm(request.POST, request.FILES)
-#             if form.is_valid():
-#                 insurance = form.save(commit=False)
-#                 insurance.patient = patient
-#                 insurance.save()
-#                 return redirect('health_insurance_list')
-#         else:
-#             form = HealthInsuranceForm()
-
-#         context = {'form': form}
-#         return render(request, 'add_health_insurance.html', context)
-#     else:
-#         # Handle unauthenticated user
-#         return redirect('login')
     
 def health_insurance_list(request):
     if request.user.is_authenticated:
@@ -542,22 +508,37 @@ def update_medical_history(request, record_id):
 
 ############################################################################
 
+
+# views.py
+
 from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Exercise, Dietary, Smoking, Alcohol, Medications, Lifestyle
 from .forms import ExerciseForm, DietaryForm, SmokingForm, AlcoholForm, MedicationsForm, LifestyleForm
-  # Import your actual model
-from .utils import get_current_patient  # Import your actual utility function
+from .models import Patient
+# views.py
 
-def view_lifestyle_details(request):
-    current_patient = get_current_patient(request)
-    lifestyle_records = LifestyleDetail.objects.filter(patient=current_patient)
+from django.forms import modelformset_factory
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Exercise, Dietary, Smoking, Alcohol, Medications, Lifestyle
+from .forms import ExerciseForm, DietaryForm, SmokingForm, AlcoholForm, MedicationsForm, LifestyleForm
+from .models import Patient
 
-    return render(request, 'view_lifestyle_details.html', {
-        'lifestyle_records': lifestyle_records,
-        'current_patient': current_patient
-    })
+# views.py
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Exercise, Dietary, Smoking, Alcohol, Medications, Lifestyle
+from .forms import ExerciseForm, DietaryForm, SmokingForm, AlcoholForm, MedicationsForm, LifestyleForm
+from .models import Patient
+
+@login_required(login_url='login')
 def add_lifestyle_details(request):
-    current_patient = get_current_patient(request)
+    current_user = request.user
 
     if request.method == 'POST':
         exercise_form = ExerciseForm(request.POST)
@@ -567,28 +548,35 @@ def add_lifestyle_details(request):
         medications_form = MedicationsForm(request.POST)
         lifestyle_form = LifestyleForm(request.POST)
 
-        if all(
-            form.is_valid() for form in [exercise_form, dietary_form, smoking_form, alcohol_form, medications_form, lifestyle_form]
-        ):
-            exercise_form.instance.patient = current_patient
-            exercise_form.save()
+        if all(form.is_valid() for form in [exercise_form, dietary_form, smoking_form, alcohol_form, medications_form, lifestyle_form]):
+            try:
+                current_patient = Patient.objects.get(user=current_user)
+                
+                exercise_form.instance.patient = current_patient
+                exercise_form.save()
 
-            dietary_form.instance.patient = current_patient
-            dietary_form.save()
+                dietary_form.instance.patient = current_patient
+                dietary_form.save()
 
-            smoking_form.instance.patient = current_patient
-            smoking_form.save()
+                smoking_form.instance.patient = current_patient
+                smoking_form.save()
 
-            alcohol_form.instance.patient = current_patient
-            alcohol_form.save()
+                alcohol_form.instance.patient = current_patient
+                alcohol_form.save()
 
-            medications_form.instance.patient = current_patient
-            medications_form.save()
+                medications_form.instance.patient = current_patient
+                medications_form.save()
 
-            lifestyle_form.instance.patient = current_patient
-            lifestyle_form.save()
+                lifestyle_form.instance.patient = current_patient
+                lifestyle_form.save()
 
-            return redirect('patient_dashboard')
+                messages.success(request, 'Lifestyle details recorded successfully.')
+                return redirect('patient_dashboard')
+            
+            except Patient.DoesNotExist:
+                messages.error(request, 'Patient not found. Please make sure your account is associated with a patient.')
+                return redirect('add_lifestyle_details')
+
     else:
         exercise_form = ExerciseForm()
         dietary_form = DietaryForm()
@@ -604,8 +592,43 @@ def add_lifestyle_details(request):
         'alcohol_form': alcohol_form,
         'medications_form': medications_form,
         'lifestyle_form': lifestyle_form,
-        'current_patient': current_patient
     })
+
+
+# views.py
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Exercise, Dietary, Smoking, Alcohol, Medications, Lifestyle
+from .models import Patient
+from django.contrib.auth.decorators import login_required
+
+@login_required(login_url='login')
+def view_lifestyle_details(request):
+    current_user = request.user
+
+    try:
+        current_patient = Patient.objects.get(user=current_user)
+
+        exercise_records = Exercise.objects.filter(patient=current_patient)
+        dietary_records = Dietary.objects.filter(patient=current_patient)
+        smoking_records = Smoking.objects.filter(patient=current_patient)
+        alcohol_records = Alcohol.objects.filter(patient=current_patient)
+        medications_records = Medications.objects.filter(patient=current_patient)
+        lifestyle_records = Lifestyle.objects.filter(patient=current_patient)
+
+        return render(request, 'view_lifestyle_details.html', {
+            'exercise_records': exercise_records,
+            'dietary_records': dietary_records,
+            'smoking_records': smoking_records,
+            'alcohol_records': alcohol_records,
+            'medications_records': medications_records,
+            'lifestyle_records': lifestyle_records,
+        })
+
+    except Patient.DoesNotExist:
+        messages.error(request, 'Patient not found. Please make sure your account is associated with a patient.')
+        return redirect('view_lifestyle_details')
 
 
 # views.py

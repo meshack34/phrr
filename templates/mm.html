@@ -1,48 +1,56 @@
-<!-- mm.html -->
-
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Add Lifestyle Details</h2>
-  <form method="post">
-    {% csrf_token %}
+<style>
+    /* Your custom styles here */
 
-    <!-- Exercise Form -->
-    <fieldset>
-      <legend>Exercise</legend>
-      {{ exercise_form.as_p }}
-    </fieldset>
+    h2 {
+        color: #333;
+    }
 
-    <!-- Dietary Form -->
-    <fieldset>
-      <legend>Dietary</legend>
-      {{ dietary_form.as_p }}
-    </fieldset>
+    .content {
+        margin-top: 20px;
+    }
 
-    <!-- Smoking Form -->
-    <fieldset>
-      <legend>Smoking</legend>
-      {{ smoking_form.as_p }}
-    </fieldset>
+    form {
+        width: 70%;
+        margin: auto;
+    }
 
-    <!-- Alcohol Form -->
-    <fieldset>
-      <legend>Alcohol</legend>
-      {{ alcohol_form.as_p }}
-    </fieldset>
+    label {
+        display: block;
+        margin-top: 10px;
+    }
 
-    <!-- Medications Form -->
-    <fieldset>
-      <legend>Medications</legend>
-      {{ medications_form.as_p }}
-    </fieldset>
+    .submit-btn {
+        margin-top: 15px;
+    }
+</style>
 
-    <!-- Lifestyle Form -->
-    <fieldset>
-      <legend>Lifestyle</legend>
-      {{ lifestyle_form.as_p }}
-    </fieldset>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
 
-    <button type="submit">Save</button>
-  </form>
+            {% include 'users/patientsidenav.html' %}
+
+            <div class="col-md-7 col-lg-8 col-xl-9">
+                <div class="card">
+                    <div class="card-body">
+                        <h2>Add Lifestyle Details</h2>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ exercise_form.as_p }}
+                            {{ dietary_form.as_p }}
+                            {{ smoking_form.as_p }}
+                            {{ alcohol_form.as_p }}
+                            {{ medications_form.as_p }}
+                            {{ lifestyle_form.as_p }}
+                            <button type="submit" class="btn btn-primary submit-btn">Save Lifestyle Details</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
