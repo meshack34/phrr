@@ -32,8 +32,8 @@ urlpatterns = [
 
     path('add_vitals/', views.add_vitals, name='add_vitals'),
     path('view_vitals/', views.view_vitals, name='view_vitals'),
-    path('update/<int:vitals_id>/', views.update_vitals, name='update_vitals'),
-    path('delete/<int:vitals_id>/', views.delete_vitals, name='delete_vitals'),
+    path('update_vitals/<int:vitals_id>/', views.update_vitals, name='update_vitals'),
+    path('delete_vitals/<int:vitals_id>/', views.delete_vitals, name='delete_vitals'),
     path('print/<int:vitals_id>/', views.print_vitals_pdf, name='print_vitals_pdf'),
 
 

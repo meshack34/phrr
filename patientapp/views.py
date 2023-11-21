@@ -445,7 +445,7 @@ def update_vitals(request, vitals_id):
     context = {
         'form': form,
     }
-    return render(request, 'vitals.update_vitals.html', context)
+    return render(request, 'vitals/update_vitals.html', context)
 
 @login_required(login_url='login')
 def delete_vitals(request, vitals_id):
@@ -469,7 +469,7 @@ def print_vitals_pdf(request, vitals_id):
     current_patient = Patient.objects.get(user=current_user)
     vitals_instance = get_object_or_404(Vitals, id=vitals_id, patient=current_patient)
 
-    template_path = 'print_vitals.html'
+    template_path = 'vitals/print_vitals.html'
     context = {'vitals_instance': vitals_instance}
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'filename="vitals_report.pdf"'

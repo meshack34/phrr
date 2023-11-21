@@ -1,40 +1,108 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Vitals History</h2>
-  {% if vitals_records %}
-    <table>
-      <thead>
-        <tr>
-          <th>Date Recorded</th>
-          <th>Temperature</th>
-          <th>Heart Rate</th>
-          <th>Blood Pressure (Systolic/Diastolic)</th>
-          <th>Respiratory Rate</th>
-          <th>Oxygen Saturation</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for record in vitals_records %}
-          <tr>
-            <td>{{ record.date_recorded }}</td>
-            <td>{{ record.temperature }}</td>
-            <td>{{ record.heart_rate }}</td>
-            <td>{{ record.blood_pressure_systolic }} / {{ record.blood_pressure_diastolic }}</td>
-            <td>{{ record.respiratory_rate }}</td>
-            <td>{{ record.oxygen_saturation }}</td>
+<style>
+    /* Your custom styles here */
 
-            <td>
-              <a href="{% url 'print_vitals_pdf' record.id %}" target="_blank">Print</a>
-              <a href="{% url 'update_vitals' record.id %}">Update</a>
-              <a href="{% url 'delete_vitals' record.id %}">Delete</a>
-          </td>
-          
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No vitals records available.</p>
-  {% endif %}
+    h2 {
+        color: #333;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #4caf50;
+        color: white;
+    }
+
+    tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    a {
+        text-decoration: none;
+        color: #4caf50;
+    }
+
+    a:hover {
+        color: #45a049;
+    }
+
+    .content {
+        margin-top: 20px;
+    }
+
+    td a {
+        display: block;
+        margin-top: 5px;
+    }
+
+</style>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+
+            {% include 'users/patientsidenav.html' %}
+
+            <div class="col-md-7 col-lg-8 col-xl-9">
+                <div class="card">
+                    <div class="card-body">
+                        <h2>View Vitals</h2>
+                        <!-- Add Vitals Form -->
+                        <div class="dispaly">
+                            <a href="{% url 'add_vitals' %}">
+                                <i class="fas fa-plus-circle"></i> Add Vitals
+                            </a>
+                        </div>
+                        <!-- Display Vitals records in a table -->
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                   
+                                    <th>Temperature</th>
+                                    <th>Heart Rate</th>
+                                    <th>Blood Pressure (Systolic/Diastolic)</th>
+                                    <th>Respiratory Rate</th>
+                                    <th>Oxygen Saturation</th>
+                                    <th>Date Recorded</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in vitals_records %}
+                                    <tr>
+                                      
+                                        <td>{{ record.temperature }}</td>
+                                        <td>{{ record.heart_rate }}</td>
+                                        <td>{{ record.blood_pressure_systolic }} / {{ record.blood_pressure_diastolic }}</td>
+                                        <td>{{ record.respiratory_rate }}</td>
+                                        <td>{{ record.oxygen_saturation }}</td>
+                                        <td>{{ record.date_recorded }}</td>
+                                        <td>
+                                            <a href="{% url 'print_vitals_pdf' record.id %}" target="_blank"><i class="fas fa-print"></i></a>
+                                            <a href="{% url 'update_vitals' record.id %}"><i class="fas fa-edit"></i> </a>
+                                            <a href="{% url 'delete_vitals' record.id %}"> <i class="fas fa-trash-alt"></i></a>
+
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

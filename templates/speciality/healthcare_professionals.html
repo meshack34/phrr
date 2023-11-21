@@ -78,6 +78,12 @@
                   <tr>
                     <th>#</th>
                     <th>Name</th>
+                    <th>Health Facility</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Speciality</th>
+                    <th>View</th>
+                    
                   </tr>
                 </thead>
                 
@@ -86,6 +92,13 @@
                     <tr>
                       <td>{{ forloop.counter }}</td>
                       <td>{{ professional.name }}</td>
+                      <td>{{ professional.health_facility }}</td>
+                      <td>{{ professional.phone }}</td>
+                      <td>{{ professional.email }}</td>
+                      <td>{{ professional.speciality }}</td>
+                      <td> <a href="#">
+                        <i class="fas fa-plus-circle"></i> view details
+                      </a></td>
                     </tr>
                   {% endfor %}
                 </tbody>
