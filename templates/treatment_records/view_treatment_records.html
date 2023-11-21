@@ -3,29 +3,93 @@
 
 {% block content %}
 <style>
-    /* Your styling here */
+  /* Your custom styles here */
+
+
+
+  h1 {
+    color: #333;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  tbody tr:hover {
+    background-color: #f5f5f5;
+  }
 </style>
 
 <div class="content">
-    <div class="container-fluid">
-        <div class="row">
+  <div class="container-fluid">
+    <div class="row">
 
-            {% include 'users/patientsidenav.html' %}
+      {% include 'users/patientsidenav.html' %}
 
-            <div class="col-md-7 col-lg-8 col-xl-9">
-                <div class="card">
-                    <div class="card-body">
-
-                        <h1>View Treatment Records</h1>
-                        <!-- Display Treatment Record records -->
-                        {% for record in treatment_records %}     
-                            <!-- Customize the display based on your model fields -->
-                            <p>{{ record.prescribed_medication }} - {{ record.start_date }}</p>
-                        {% endfor %}
-                    </div>
-                </div>
+      <div class="col-md-7 col-lg-8 col-xl-9">
+        <div class="card">
+          <div class="card-body">
+            <h1>View Treatment Records</h1>
+            <!-- Add Treatment Records Form -->
+            <div class="dispaly">
+              <a href="{% url 'add_treatment_record' %}">
+                <i class="fas fa-plus-circle"></i> Add Treatment Records
+              </a>
             </div>
+
+            <!-- Display Treatment Record records -->
+            {% for record in treatment_records %}     
+              <!-- Customize the display based on your model fields -->
+              <div class="dispaly">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Prescribed Medication</th>
+                      <th>Dosage</th>
+                      <th>Start Date</th>
+                      <th>End Date</th>
+                      <th>monitoring schedule</th>
+                      <th>Start results</th>
+                      <th> date recorded</th>
+                      
+                      <!-- Add more headers based on your model fields -->
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{{ record.prescribed_medication }}</td>
+                      <td>{{ record.dosage }}</td>
+                      <td>{{ record.start_date }}</td>
+                      <td>{{ record.end_date }}</td>  
+                      <td>{{ record.monitoring_schedule }}</td>
+                      <td>{{ record.results }}</td>
+                      <td>{{ record.date_recorded }}</td>
+                      
+                      
+                      
+                      <!-- Add more cells based on your model fields -->
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            {% endfor %}
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}
