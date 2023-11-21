@@ -478,7 +478,6 @@ def newview_medical_history(request):
     current_user = request.user
     current_patient = Patient.objects.get(user=current_user)
     medical_history_records = NewmedicalHistory.objects.filter(patient=current_patient)
-    print([record.id for record in medical_history_records])  # Add this line
 
     context = {
         'medical_history_records': medical_history_records,
