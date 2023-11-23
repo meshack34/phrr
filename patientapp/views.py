@@ -74,7 +74,115 @@ def home(request):
     return render(request, 'home/index.html')
 
 
-def patientregister(request):
+# def patientregister(request):
+#     if request.method == 'POST':
+#         form = RegistrationForm(request.POST)
+#         if form.is_valid():
+#             # Extract cleaned data from the form
+#             first_name = form.cleaned_data['first_name']
+#             last_name = form.cleaned_data['last_name']
+#             phone_number = form.cleaned_data['phone_number']
+#             email = form.cleaned_data['email']
+#             password = form.cleaned_data['password']
+
+#             # Create a user without user_type
+#             username = email.split("@")[0]
+#             user = Account.objects.create_user(
+#                 first_name=first_name,
+#                 last_name=last_name,
+#                 email=email,
+#                 username=username,
+#                 password=password
+#             )
+
+#             # Set additional fields
+#             user.phone_number = phone_number
+#             user.save()
+
+#             messages.success(request, 'Registration successful. You can now login.')
+#             return redirect('login')
+                    
+#     else:
+#         form = RegistrationForm()
+    
+#     context = {
+#         'form': form
+#     }
+#     return render(request, 'users/register.html', context)
+
+
+# def login(request):
+#     if request.method == 'POST':
+#         email = request.POST['email']
+#         password = request.POST['password']
+
+#         user = authenticate(email=email, password=password)
+        
+#         if user is not None:
+            
+#             auth_login(request, user)
+#             current_user = Account.objects.get(id=request.user.id)
+#             patient_exists = Patient.objects.filter(user=current_user).exists()
+
+#             if patient_exists:
+#                 return redirect('patient_dashboard')
+#             else:
+#                 patient = Patient(user=current_user)
+#                 patient.save()
+#                 return redirect('patient_dashboard')
+#         else:
+#             messages.success(request, 'Invalid Credentials')
+#             return redirect('login')
+
+#     return render(request, 'users/login.html')
+
+
+import random
+import string
+from django.contrib.auth import authenticate, login as auth_login
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import RegistrationForm
+from .models import Account, Patient
+from phonenumbers import parse as parse_phone_number, PhoneNumberFormat
+from twilio.rest import Client
+import os
+
+# Your existing code...
+
+
+from django.contrib.auth import authenticate, login as auth_login
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import RegistrationForm
+from .models import Account, Patient
+
+from phonenumbers import parse as parse_phone_number, PhoneNumberFormat
+from twilio.rest import Client
+import os
+
+def generate_account_id():
+    length = 8 
+    first_char = random.choice(string.ascii_letters)  # Start with a letter
+    account_id = [first_char] + random.choices(string.ascii_letters + string.digits + '_', k=length - 1)
+    account_id = ''.join(account_id)
+
+    return account_id
+
+def send_sms_verification(phone_number, account_id):
+    account_sid = "ACc319ba45a57855df8b48288ff7f8bf55"
+    auth_token = "26f308193c3bfd9ffe5ce4459e0b7965"
+    client = Client(account_sid, auth_token)
+    twilio_phone_number ="+16066180215"
+    message = client.messages.create(
+        body=f"Your account ID is {account_id}",
+        from_=twilio_phone_number,
+        to=phone_number
+    )
+
+    return message.sid
+
+def patient_register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -85,21 +193,27 @@ def patientregister(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
 
-            # Create a user without user_type
-            username = email.split("@")[0]
+            # Generate account_id
+            account_id = generate_account_id()
+            
+            # Create a user with the account_id
             user = Account.objects.create_user(
                 first_name=first_name,
                 last_name=last_name,
                 email=email,
-                username=username,
-                password=password
+                username=email,
+                password=password,
+                account_id=account_id,
             )
 
             # Set additional fields
             user.phone_number = phone_number
             user.save()
 
-            messages.success(request, 'Registration successful. You can now login.')
+            # Send SMS verification
+            send_sms_verification(phone_number, account_id)
+
+            messages.success(request, 'Registration successful. Check your phone for the account ID.')
             return redirect('login')
                     
     else:
@@ -110,16 +224,14 @@ def patientregister(request):
     }
     return render(request, 'users/register.html', context)
 
-
-def login(request):
+def user_login(request):
     if request.method == 'POST':
-        email = request.POST['email']
+        account_id = request.POST['account_id']
         password = request.POST['password']
 
-        user = authenticate(email=email, password=password)
+        user = authenticate(account_id=account_id, password=password)
         
         if user is not None:
-            
             auth_login(request, user)
             current_user = Account.objects.get(id=request.user.id)
             patient_exists = Patient.objects.filter(user=current_user).exists()
@@ -135,6 +247,31 @@ def login(request):
             return redirect('login')
 
     return render(request, 'users/login.html')
+
+
+# def user_login(request):
+#     if request.method == 'POST':
+#         email = request.POST['email']
+#         password = request.POST['password']
+
+#         user = authenticate(account_id=email, password=password)
+        
+#         if user is not None:
+#             auth_login(request, user)
+#             current_user = Account.objects.get(id=request.user.id)
+#             patient_exists = Patient.objects.filter(user=current_user).exists()
+
+#             if patient_exists:
+#                 return redirect('patient_dashboard')
+#             else:
+#                 patient = Patient(user=current_user)
+#                 patient.save()
+#                 return redirect('patient_dashboard')
+#         else:
+#             messages.success(request, 'Invalid Credentials')
+#             return redirect('login')
+
+#     return render(request, 'users/login.html')
 
 @login_required(login_url='login')
 def logout(request):

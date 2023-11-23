@@ -12,20 +12,20 @@ from .models import *
 # Add these imports to the top of your models.py
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-
 class AccountManager(BaseUserManager):
-    def create_user(self, first_name, last_name, username, email, password=None):
+    def create_user(self, first_name, last_name, username, email, password=None, account_id=None):
         user = self.model(
-            email = self.normalize_email(email),
-            first_name = first_name,
-            last_name = last_name,
-            username = username,
-
+            email=self.normalize_email(email),
+            first_name=first_name,
+            last_name=last_name,
+            username=username,
+            account_id=account_id,
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
+
     
     def create_superuser(self, email, first_name, last_name, username, password):
         user = self.create_user(
@@ -57,8 +57,9 @@ class Account(AbstractBaseUser):
     is_active        = models.BooleanField(default=True)
     is_superadmin        = models.BooleanField(default=False)
 
+    account_id = models.CharField(max_length=32, unique=True)  # Added account_id
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'account_id'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     objects = AccountManager()
@@ -111,6 +112,7 @@ class Patient(models.Model):
     
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
+
 
 
 class HealthcareSpecialty(models.Model):

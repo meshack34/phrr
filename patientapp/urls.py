@@ -3,7 +3,9 @@ from .import views
 urlpatterns = [
     # new
     path('',views.home, name='home'),
-    path('register/',views.patientregister, name='register'),
+    path('patient_register/',views.patient_register, name='register'),
+    path('login/',views.user_login, name='login'),
+    
     path('patient/dashboard/',views.patient_dashboard, name='patient_dashboard'),
     path('patients_profile/', views.patients_profile, name='patients_profile'),
     path('patients_profile/', views.patients_profile, name='patients_profile'),
@@ -87,7 +89,7 @@ urlpatterns = [
     path('view_history/<int:patient_id>/', views.view_history, name='view_history'),
     
     path('doctor/register/',views.doc_register, name='doctor-register'),
-    path('login/',views.login, name='login'),
+   
     path('logout/',views.logout, name='logout'),
     path('doctor/dashboard/',views.doctor_dashboard, name='doctor_dashboard'),
     path('status/<int:patient_id>',views.status, name='status'),
