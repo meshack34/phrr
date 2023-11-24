@@ -378,6 +378,39 @@ def recover_account_id(request):
         # Display the form to input security answers
         return render(request, 'users/account_recovery.html')
 
+# views.py
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Account
+
+def account_recovery(request):
+    if request.method == 'POST':
+        security_answer_1 = request.POST.get('security_answer_1')
+        security_answer_2 = request.POST.get('security_answer_2')
+
+        user = Account.objects.filter(
+            security_answer_1=security_answer_1,
+            security_answer_2=security_answer_2
+        ).first()
+
+        if user:
+            # Retrieve the existing account ID
+            account_id = user.account_id
+
+            # Send recovery details via email and SMS
+            send_email_verification(user.email, account_id)
+            send_sms_verification(user.phone_number, account_id)
+
+            messages.success(request, 'Recovery details sent to your email and phone number.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Invalid security answers. Please try again.')
+
+    return render(request, 'users/account_recoveryy.html')
+
+
+
 def password_recovery(request):
     if request.method == 'POST':
         account_id = request.POST.get('account_id')

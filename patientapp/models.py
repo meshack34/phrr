@@ -72,9 +72,12 @@ class Account(AbstractBaseUser):
     account_id = models.CharField(max_length=32, unique=True)  
     security_question_1 = models.CharField(max_length=100, blank=True, null=True)
     security_answer_1 = models.CharField(max_length=100, blank=True, null=True)
-
     security_question_2 = models.CharField(max_length=100, blank=True, null=True)
     security_answer_2 = models.CharField(max_length=100, blank=True, null=True)
+
+    password_reset_token = models.CharField(max_length=255, blank=True, null=True)
+    password_reset_token_created_at = models.DateTimeField(blank=True, null=True)
+
 
     USERNAME_FIELD = 'account_id'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
