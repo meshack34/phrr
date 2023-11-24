@@ -156,31 +156,45 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import RegistrationForm
 from .models import Account, Patient
-
+import random
+import string
 from phonenumbers import parse as parse_phone_number, PhoneNumberFormat
 from twilio.rest import Client
 import os
+from django.core.mail import send_mail
+from .forms import RegistrationForm
+from .models import Account
+from twilio.rest import Client
+import random
+import string
+from django.shortcuts import render, redirect
+from django.contrib import messages
 
 def generate_account_id():
     length = 8 
     first_char = random.choice(string.ascii_letters)  # Start with a letter
     account_id = [first_char] + random.choices(string.ascii_letters + string.digits + '_', k=length - 1)
     account_id = ''.join(account_id)
-
     return account_id
 
 def send_sms_verification(phone_number, account_id):
     account_sid = "ACc319ba45a57855df8b48288ff7f8bf55"
-    auth_token = "26f308193c3bfd9ffe5ce4459e0b7965"
+    auth_token = "3819ffd7803c5ff00cfa03d98283ec3f"
     client = Client(account_sid, auth_token)
-    twilio_phone_number ="+16066180215"
+    twilio_phone_number = "+16066180215"
     message = client.messages.create(
         body=f"Your account ID is {account_id}",
         from_=twilio_phone_number,
         to=phone_number
     )
-
     return message.sid
+
+def send_email_verification(email, account_id):
+    subject = 'Your Account ID'
+    message = f'Your account ID is {account_id}.'
+    from_email = 'meshackkimutai34@gmail.com'  
+    recipient_list = [email]
+    send_mail(subject, message, from_email, recipient_list)
 
 def patient_register(request):
     if request.method == 'POST':
@@ -213,7 +227,10 @@ def patient_register(request):
             # Send SMS verification
             send_sms_verification(phone_number, account_id)
 
-            messages.success(request, 'Registration successful. Check your phone for the account ID.')
+            # Send Email verification
+            send_email_verification(email, account_id)
+
+            messages.success(request, 'Registration successful. Check your phone and email for the account ID.')
             return redirect('login')
                     
     else:
@@ -223,6 +240,82 @@ def patient_register(request):
         'form': form
     }
     return render(request, 'users/register.html', context)
+
+
+# def generate_account_id():
+#     length = 8 
+#     first_char = random.choice(string.ascii_letters)  # Start with a letter
+#     account_id = [first_char] + random.choices(string.ascii_letters + string.digits + '_', k=length - 1)
+#     account_id = ''.join(account_id)
+
+#     return account_id
+
+# def send_sms_verification(phone_number, account_id):
+#     account_sid = "ACc319ba45a57855df8b48288ff7f8bf55"
+#     auth_token = "3819ffd7803c5ff00cfa03d98283ec3f"
+#     client = Client(account_sid, auth_token)
+#     twilio_phone_number ="+16066180215"
+#     message = client.messages.create(
+#         body=f"Your account ID is {account_id}",
+#         from_=twilio_phone_number,
+#         to=phone_number
+#     )
+
+#     return message.sid
+
+# from django.core.mail import send_mail
+
+# def send_email_verification(email, account_id):
+#     subject = 'Your Account ID'
+#     message = f'Your account ID is {account_id}.'
+#     from_email = 'meshackkimutai34@gmail.com'  
+#     recipient_list = [email]
+
+#     send_mail(subject, message, from_email, recipient_list)
+    
+    
+# def patient_register(request):
+#     if request.method == 'POST':
+#         form = RegistrationForm(request.POST)
+#         if form.is_valid():
+#             # Extract cleaned data from the form
+#             first_name = form.cleaned_data['first_name']
+#             last_name = form.cleaned_data['last_name']
+#             phone_number = form.cleaned_data['phone_number']
+#             email = form.cleaned_data['email']
+#             password = form.cleaned_data['password']
+
+#             # Generate account_id
+#             account_id = generate_account_id()
+            
+#             # Create a user with the account_id
+#             user = Account.objects.create_user(
+#                 first_name=first_name,
+#                 last_name=last_name,
+#                 email=email,
+#                 username=email,
+#                 password=password,
+#                 account_id=account_id,
+#             )
+
+#             # Set additional fields
+#             user.phone_number = phone_number
+#             user.save()
+
+#             # Send SMS verification
+#             send_sms_verification(phone_number, account_id)
+
+#             messages.success(request, 'Registration successful. Check your phone for the account ID.')
+#             return redirect('login')
+                    
+#     else:
+#         form = RegistrationForm()
+    
+#     context = {
+#         'form': form
+#     }
+#     return render(request, 'users/register.html', context)
+
 
 def user_login(request):
     if request.method == 'POST':
@@ -280,6 +373,7 @@ def logout(request):
     return redirect('home')
 
 @login_required(login_url='login')
+
 def patients_profile(request):
     current_user = request.user
     current_patient = Patient.objects.get(user=current_user)
