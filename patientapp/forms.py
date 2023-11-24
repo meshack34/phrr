@@ -4,7 +4,10 @@ from django.forms.fields import DateField
 from django.forms.widgets import PasswordInput
 from django import forms
 from django.forms import DateInput, DateField, PasswordInput
+from django import forms
+from django.forms import PasswordInput
 
+from .models import Account
 from .models import HealthInsurance
 from .models import MedicalHistory, TreatmentRecord
 from django import forms
@@ -69,19 +72,23 @@ class MedicalTreatmentForm(forms.ModelForm):
 
 
 class RegistrationForm(forms.ModelForm):
-    password = forms.CharField(widget=PasswordInput(attrs={
-        'class': 'form-control',
-    }))
-    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Confirm Password'
-    }))
+    password = forms.CharField(widget=PasswordInput(attrs={'class': 'form-control'}))
+    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password'}))
+    
+    security_question_1 = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    security_answer_1 = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+    security_question_2 = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    security_answer_2 = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Account
         fields = ['first_name', 'last_name', 'phone_number', 'email', 'password']
-    
+
     def __init__(self, *args, **kwargs):
         super(RegistrationForm, self).__init__(*args, **kwargs)
+        
+        # Set form-control class for all fields
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
 
@@ -92,8 +99,6 @@ class RegistrationForm(forms.ModelForm):
 
         if password and confirm_password and password != confirm_password:
             raise forms.ValidationError("Passwords do not match.")
-
-
 
 
 

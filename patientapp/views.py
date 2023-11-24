@@ -206,6 +206,11 @@ def patient_register(request):
             phone_number = form.cleaned_data['phone_number']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
+            security_question_1 = form.cleaned_data['security_question_1']
+            security_answer_1 = form.cleaned_data['security_answer_1']
+
+            security_question_2 = form.cleaned_data['security_question_2']
+            security_answer_2 = form.cleaned_data['security_answer_2']
 
             # Generate account_id
             account_id = generate_account_id()
@@ -218,6 +223,10 @@ def patient_register(request):
                 username=email,
                 password=password,
                 account_id=account_id,
+                security_question_1=security_question_1,
+                security_answer_1=security_answer_1,
+                security_question_2=security_question_2,
+                security_answer_2=security_answer_2,
             )
 
             # Set additional fields
@@ -340,7 +349,49 @@ def user_login(request):
             return redirect('login')
 
     return render(request, 'users/login.html')
+from django.shortcuts import render
+from .models import Account
 
+def recover_account_id(request):
+    if request.method == 'POST':
+        # Extract data from the form
+        security_question_1 = request.POST.get('security_question_1')
+        security_answer_1 = request.POST.get('security_answer_1')
+        security_question_2 = request.POST.get('security_question_2')
+        security_answer_2 = request.POST.get('security_answer_2')
+
+        # Attempt to retrieve the account using security questions
+        account = Account.objects.get_account_by_security_answers(
+            security_question_1=security_question_1,
+            security_answer_1=security_answer_1,
+            security_question_2=security_question_2,
+            security_answer_2=security_answer_2,
+        )
+
+        if account:
+            # Account found, display the account ID or redirect to a page with the account information
+            return render(request, 'users/account_recovery_result.html', {'account_id': account.account_id})
+        else:
+            # Account not found or security answers are incorrect
+            return render(request, 'users/account_recovery.html', {'error_message': 'Invalid security answers'})
+    else:
+        # Display the form to input security answers
+        return render(request, 'users/account_recovery.html')
+
+def password_recovery(request):
+    if request.method == 'POST':
+        account_id = request.POST.get('account_id')
+        security_answer_1 = request.POST.get('security_answer_1')
+        security_answer_2 = request.POST.get('security_answer_2')
+
+        try:
+            user = Account.objects.get(account_id=account_id, security_answer_1=security_answer_1, security_answer_2=security_answer_2)
+            # Perform password reset logic here (generate a new password, send an email, etc.)
+            # You might want to redirect the user to a password reset form or display a success message.
+        except Account.DoesNotExist:
+            messages.error(request, 'Invalid account ID or security answers.')
+
+    return render(request, 'users/password_recovery.html')
 
 # def user_login(request):
 #     if request.method == 'POST':

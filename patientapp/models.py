@@ -13,28 +13,29 @@ from .models import *
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 class AccountManager(BaseUserManager):
-    def create_user(self, first_name, last_name, username, email, password=None, account_id=None):
+    
+    def create_user(self, first_name, last_name, username, email, password=None, account_id=None, **extra_fields):
         user = self.model(
             email=self.normalize_email(email),
             first_name=first_name,
             last_name=last_name,
             username=username,
             account_id=account_id,
+            **extra_fields,  # Include additional fields
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
-    
 
-
-    def create_superuser(self, email, first_name, last_name, username, password):
+    def create_superuser(self, email, first_name, last_name, username, password, **extra_fields):
         user = self.create_user(
-            email = self.normalize_email(email),
-            username = username,
-            password = password,
-            first_name = first_name,
-            last_name = last_name,
+            email=self.normalize_email(email),
+            username=username,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            **extra_fields,  # Include additional fields
         )
         user.is_admin = True
         user.is_active = True
@@ -42,9 +43,19 @@ class AccountManager(BaseUserManager):
         user.is_superadmin = True
         user.save(using=self._db)
         return user
+        
 
-
-
+    def get_account_by_security_answers(self, security_question_1, security_answer_1, security_question_2, security_answer_2):
+        try:
+            return self.get(
+                security_question_1=security_question_1,
+                security_answer_1=security_answer_1,
+                security_question_2=security_question_2,
+                security_answer_2=security_answer_2,
+            )
+        except self.model.DoesNotExist:
+            return None
+        
 class Account(AbstractBaseUser):
     email           = models.EmailField(max_length=100, unique=True)
     first_name      = models.CharField(max_length=50)
@@ -58,7 +69,12 @@ class Account(AbstractBaseUser):
     is_active        = models.BooleanField(default=True)
     is_superadmin        = models.BooleanField(default=False)
 
-    account_id = models.CharField(max_length=32, unique=True)  # Added account_id
+    account_id = models.CharField(max_length=32, unique=True)  
+    security_question_1 = models.CharField(max_length=100, blank=True, null=True)
+    security_answer_1 = models.CharField(max_length=100, blank=True, null=True)
+
+    security_question_2 = models.CharField(max_length=100, blank=True, null=True)
+    security_answer_2 = models.CharField(max_length=100, blank=True, null=True)
 
     USERNAME_FIELD = 'account_id'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
