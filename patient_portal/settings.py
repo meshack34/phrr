@@ -52,6 +52,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'patient_portal.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -128,6 +129,10 @@ AUTH_USER_MODEL = 'patientapp.Account'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+AUTHENTICATION_BACKENDS = [
+    'patientapp.backends.MyCustomBackend',  
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 REST_FRAMEWORK = {
    "DEFAULT_PERMISSION_CLASSES": [

@@ -1,6 +1,6 @@
-
+from django.utils.http import urlsafe_base64_decode
 from django.template.loader import get_template
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseServerError
 from xhtml2pdf import pisa
 from django.shortcuts import (render, redirect, get_object_or_404,)
 from .models import *
@@ -8,15 +8,18 @@ from django.shortcuts import render, redirect
 from .models import MedicalHistory, TreatmentRecord
 from .forms import MedicalHistoryForm, TreatmentRecordForm
 from .models import Patient
+from django.urls import path
+
+
 from django.contrib import messages
-from django.shortcuts import render, redirect
+
 from django.contrib.auth import authenticate, login as auth_login
 from .models import Account, Patient
-from django.shortcuts import render, redirect
+
 from django.contrib import messages
 from .forms import VitalsForm
 from .models import Vitals
-from django.shortcuts import render, redirect
+
 from django.contrib import messages
 from .forms import NEWMedicalHistoryForm
 from django.shortcuts import render, redirect, get_object_or_404
@@ -25,14 +28,19 @@ from .forms import MedicalHistoryyyForm, TreatmentRecordForm
 from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+
 from .models import HealthcareProfessional, Patient
 from .forms import HealthcareProfessionalForm
-from django.shortcuts import render, redirect, get_object_or_404
+
 from .models import MedicalHistory, TreatmentRecord, Patient
 from .forms import MedicalHistoryForm, TreatmentRecordForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+# views.py
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from .models import AdditionalUser
+
 
 from .models import (
     Patient, MedicalHistoryy, DoctorSpecialization, Medication, Doctor,
@@ -74,69 +82,6 @@ def home(request):
     return render(request, 'home/index.html')
 
 
-# def patientregister(request):
-#     if request.method == 'POST':
-#         form = RegistrationForm(request.POST)
-#         if form.is_valid():
-#             # Extract cleaned data from the form
-#             first_name = form.cleaned_data['first_name']
-#             last_name = form.cleaned_data['last_name']
-#             phone_number = form.cleaned_data['phone_number']
-#             email = form.cleaned_data['email']
-#             password = form.cleaned_data['password']
-
-#             # Create a user without user_type
-#             username = email.split("@")[0]
-#             user = Account.objects.create_user(
-#                 first_name=first_name,
-#                 last_name=last_name,
-#                 email=email,
-#                 username=username,
-#                 password=password
-#             )
-
-#             # Set additional fields
-#             user.phone_number = phone_number
-#             user.save()
-
-#             messages.success(request, 'Registration successful. You can now login.')
-#             return redirect('login')
-                    
-#     else:
-#         form = RegistrationForm()
-    
-#     context = {
-#         'form': form
-#     }
-#     return render(request, 'users/register.html', context)
-
-
-# def login(request):
-#     if request.method == 'POST':
-#         email = request.POST['email']
-#         password = request.POST['password']
-
-#         user = authenticate(email=email, password=password)
-        
-#         if user is not None:
-            
-#             auth_login(request, user)
-#             current_user = Account.objects.get(id=request.user.id)
-#             patient_exists = Patient.objects.filter(user=current_user).exists()
-
-#             if patient_exists:
-#                 return redirect('patient_dashboard')
-#             else:
-#                 patient = Patient(user=current_user)
-#                 patient.save()
-#                 return redirect('patient_dashboard')
-#         else:
-#             messages.success(request, 'Invalid Credentials')
-#             return redirect('login')
-
-#     return render(request, 'users/login.html')
-
-
 import random
 import string
 from django.contrib.auth import authenticate, login as auth_login
@@ -147,10 +92,6 @@ from .models import Account, Patient
 from phonenumbers import parse as parse_phone_number, PhoneNumberFormat
 from twilio.rest import Client
 import os
-
-# Your existing code...
-
-
 from django.contrib.auth import authenticate, login as auth_login
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -169,13 +110,29 @@ import random
 import string
 from django.shortcuts import render, redirect
 from django.contrib import messages
+import random
+import string
+from .models import Account
 
 def generate_account_id():
     length = 8 
-    first_char = random.choice(string.ascii_letters)  # Start with a letter
-    account_id = [first_char] + random.choices(string.ascii_letters + string.digits + '_', k=length - 1)
-    account_id = ''.join(account_id)
+    while True:
+        first_char = random.choice(string.ascii_letters)  # Start with a letter
+        account_id = [first_char] + random.choices(string.ascii_letters + string.digits + '_', k=length - 1)
+        account_id = ''.join(account_id)
+
+        # Check if the generated account_id already exists
+        if not Account.objects.filter(account_id=account_id).exists():
+            break
+
     return account_id
+
+# def generate_account_id():
+#     length = 8 
+#     first_char = random.choice(string.ascii_letters)  # Start with a letter
+#     account_id = [first_char] + random.choices(string.ascii_letters + string.digits + '_', k=length - 1)
+#     account_id = ''.join(account_id)
+#     return account_id
 
 def send_sms_verification(phone_number, account_id):
     account_sid = "ACc319ba45a57855df8b48288ff7f8bf55"
@@ -197,142 +154,98 @@ def send_email_verification(email, account_id):
     send_mail(subject, message, from_email, recipient_list)
 
 def patient_register(request):
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            # Extract cleaned data from the form
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
-            phone_number = form.cleaned_data['phone_number']
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            security_question_1 = form.cleaned_data['security_question_1']
-            security_answer_1 = form.cleaned_data['security_answer_1']
+    if True:
+        if request.method == 'POST':
+            form = RegistrationForm(request.POST)
+            if form.is_valid():
+                # Extract cleaned data from the form
+                first_name = form.cleaned_data['first_name']
+                last_name = form.cleaned_data['last_name']
+                phone_number = form.cleaned_data['phone_number']
+                email = form.cleaned_data['email']
+                password = form.cleaned_data['password']
+                security_question_1 = form.cleaned_data['security_question_1']
+                security_answer_1 = form.cleaned_data['security_answer_1']
 
-            security_question_2 = form.cleaned_data['security_question_2']
-            security_answer_2 = form.cleaned_data['security_answer_2']
+                security_question_2 = form.cleaned_data['security_question_2']
+                security_answer_2 = form.cleaned_data['security_answer_2']
 
-            # Generate account_id
-            account_id = generate_account_id()
-            
-            # Create a user with the account_id
-            user = Account.objects.create_user(
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                username=email,
-                password=password,
-                account_id=account_id,
-                security_question_1=security_question_1,
-                security_answer_1=security_answer_1,
-                security_question_2=security_question_2,
-                security_answer_2=security_answer_2,
-            )
+                # Generate account_id
+                account_id = generate_account_id()
+                
+                # Create a user with the account_id
+                user = Account.objects.create_user(
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    username=email,
+                    password=password,
+                    account_id=account_id,
+                    security_question_1=security_question_1,
+                    security_answer_1=security_answer_1,
+                    security_question_2=security_question_2,
+                    security_answer_2=security_answer_2,
+                )
 
-            # Set additional fields
-            user.phone_number = phone_number
-            user.save()
+                # Set additional fields
+                user.phone_number = phone_number
+                user.save()
 
-            # Send SMS verification
-            send_sms_verification(phone_number, account_id)
+                # Send SMS verification
+                sms_respose=send_sms_verification(phone_number, account_id)
+                print('sms_respose',sms_respose)
 
-            # Send Email verification
-            send_email_verification(email, account_id)
+                # Send Email verification
+                email_respose=send_email_verification(email, account_id)
+                print('email_respose',email_respose)
 
-            messages.success(request, 'Registration successful. Check your phone and email for the account ID.')
-            return redirect('login')
-                    
-    else:
-        form = RegistrationForm()
-    
-    context = {
-        'form': form
-    }
-    return render(request, 'users/register.html', context)
+                messages.success(request, 'Registration successful. Check your phone and email for the account ID.')
+                return redirect('login')
+                        
+        else:
+            form = RegistrationForm()
+        
+        context = {
+            'form': form
+        }
+        return render(request, 'users/register.html', context)
+    # except Exception as e:
+    #     # Log the exception for debugging purposes
+    #     print(f"Error during registration: {str(e)}")
 
+    #     # Display a generic error message to the user
+    #     messages.error(request, 'An error occurred during registration. Please try again later.')
+    #     return HttpResponseServerError('Internal Server Error')
 
-# def generate_account_id():
-#     length = 8 
-#     first_char = random.choice(string.ascii_letters)  # Start with a letter
-#     account_id = [first_char] + random.choices(string.ascii_letters + string.digits + '_', k=length - 1)
-#     account_id = ''.join(account_id)
+# views.py
+from django.shortcuts import render, redirect
+from django.views.generic.edit import CreateView
+from .models import AdditionalUser
+from .forms import AdditionalUserForm
 
-#     return account_id
+class AdditionalUserCreateView(CreateView):
+    model = AdditionalUser
+    form_class = AdditionalUserForm
+    template_name = 'users/add_additional_user.html'
 
-# def send_sms_verification(phone_number, account_id):
-#     account_sid = "ACc319ba45a57855df8b48288ff7f8bf55"
-#     auth_token = "3819ffd7803c5ff00cfa03d98283ec3f"
-#     client = Client(account_sid, auth_token)
-#     twilio_phone_number ="+16066180215"
-#     message = client.messages.create(
-#         body=f"Your account ID is {account_id}",
-#         from_=twilio_phone_number,
-#         to=phone_number
-#     )
+    def form_valid(self, form):
+        form.instance.creator = self.request.user
+        return super().form_valid(form)
 
-#     return message.sid
-
-# from django.core.mail import send_mail
-
-# def send_email_verification(email, account_id):
-#     subject = 'Your Account ID'
-#     message = f'Your account ID is {account_id}.'
-#     from_email = 'meshackkimutai34@gmail.com'  
-#     recipient_list = [email]
-
-#     send_mail(subject, message, from_email, recipient_list)
-    
-    
-# def patient_register(request):
-#     if request.method == 'POST':
-#         form = RegistrationForm(request.POST)
-#         if form.is_valid():
-#             # Extract cleaned data from the form
-#             first_name = form.cleaned_data['first_name']
-#             last_name = form.cleaned_data['last_name']
-#             phone_number = form.cleaned_data['phone_number']
-#             email = form.cleaned_data['email']
-#             password = form.cleaned_data['password']
-
-#             # Generate account_id
-#             account_id = generate_account_id()
-            
-#             # Create a user with the account_id
-#             user = Account.objects.create_user(
-#                 first_name=first_name,
-#                 last_name=last_name,
-#                 email=email,
-#                 username=email,
-#                 password=password,
-#                 account_id=account_id,
-#             )
-
-#             # Set additional fields
-#             user.phone_number = phone_number
-#             user.save()
-
-#             # Send SMS verification
-#             send_sms_verification(phone_number, account_id)
-
-#             messages.success(request, 'Registration successful. Check your phone for the account ID.')
-#             return redirect('login')
-                    
-#     else:
-#         form = RegistrationForm()
-    
-#     context = {
-#         'form': form
-#     }
-#     return render(request, 'users/register.html', context)
-
+    def get_success_url(self):
+        return '/success/'  # Redirect to a success page or adjust as needed
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login as auth_login
+from django.contrib import messages
+from .models import Account, Patient
 
 def user_login(request):
     if request.method == 'POST':
         account_id = request.POST['account_id']
         password = request.POST['password']
 
-        user = authenticate(account_id=account_id, password=password)
-        
+        user = authenticate(request, account_id=account_id, password=password)
+
         if user is not None:
             auth_login(request, user)
             current_user = Account.objects.get(id=request.user.id)
@@ -345,12 +258,37 @@ def user_login(request):
                 patient.save()
                 return redirect('patient_dashboard')
         else:
-            messages.success(request, 'Invalid Credentials')
+            messages.error(request, 'Invalid Credentials')
             return redirect('login')
 
     return render(request, 'users/login.html')
-from django.shortcuts import render
-from .models import Account
+
+
+# def user_login(request):
+#     if request.method == 'POST':
+#         account_id = request.POST['account_id']
+#         password = request.POST['password']
+
+#         user = authenticate(account_id=account_id, password=password)
+        
+#         if user is not None:
+#             auth_login(request, user)
+#             current_user = Account.objects.get(id=request.user.id)
+#             patient_exists = Patient.objects.filter(user=current_user).exists()
+
+#             if patient_exists:
+#                 return redirect('patient_dashboard')
+#             else:
+#                 patient = Patient(user=current_user)
+#                 patient.save()
+#                 return redirect('patient_dashboard')
+#         else:
+#             messages.success(request, 'Invalid Credentials')
+#             return redirect('login')
+
+#     return render(request, 'users/login.html')
+
+
 
 def recover_account_id(request):
     if request.method == 'POST':
@@ -409,46 +347,229 @@ def account_recovery(request):
 
     return render(request, 'users/account_recoveryy.html')
 
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.conf import settings
+from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
 
 
-def password_recovery(request):
+def send_password_reset_email(email, token):
+    subject = 'Reset Your Password'
+    message = f'Click the link to reset your password: {settings.BASE_URL}/reset_password/{urlsafe_base64_encode(force_bytes(email))}/{token}/'
+    from_email = 'meshackkimutai34@gmail.com'  
+    recipient_list = [email]
+
+    send_mail(subject, message, from_email, recipient_list)
+
+
+def forgot_password(request):
     if request.method == 'POST':
-        account_id = request.POST.get('account_id')
-        security_answer_1 = request.POST.get('security_answer_1')
-        security_answer_2 = request.POST.get('security_answer_2')
+        email = request.POST.get('email')
 
-        try:
-            user = Account.objects.get(account_id=account_id, security_answer_1=security_answer_1, security_answer_2=security_answer_2)
-            # Perform password reset logic here (generate a new password, send an email, etc.)
-            # You might want to redirect the user to a password reset form or display a success message.
-        except Account.DoesNotExist:
-            messages.error(request, 'Invalid account ID or security answers.')
+        user = Account.objects.filter(email=email).first()
 
-    return render(request, 'users/password_recovery.html')
+        if user:
+            # Generate a password reset token
+            token = default_token_generator.make_token(user)
+            user.password_reset_token = token
+            user.password_reset_token_created_at = timezone.now()
+            user.save()
 
-# def user_login(request):
-#     if request.method == 'POST':
-#         email = request.POST['email']
-#         password = request.POST['password']
+            # Send password reset details via email
+            send_password_reset_email(user.email, user.password_reset_token)
 
-#         user = authenticate(account_id=email, password=password)
-        
-#         if user is not None:
-#             auth_login(request, user)
-#             current_user = Account.objects.get(id=request.user.id)
-#             patient_exists = Patient.objects.filter(user=current_user).exists()
+            messages.success(request, 'Password reset details sent to your email.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Invalid email address. Please try again.')
 
-#             if patient_exists:
-#                 return redirect('patient_dashboard')
-#             else:
-#                 patient = Patient(user=current_user)
-#                 patient.save()
-#                 return redirect('patient_dashboard')
-#         else:
-#             messages.success(request, 'Invalid Credentials')
-#             return redirect('login')
+    return render(request, 'users/forgot_password.html')
 
-#     return render(request, 'users/login.html')
+
+
+
+def reset_password(request, email_b64, token):
+    try:
+        email = urlsafe_base64_decode(email_b64).decode('utf-8')
+        user = Account.objects.get(email=email, password_reset_token=token)
+    except (TypeError, ValueError, OverflowError, Account.DoesNotExist):
+        # Invalid token or email
+        messages.error(request, 'Invalid password reset link.')
+        return redirect('login')
+
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if new_password == confirm_password:
+            # Set the new password and clear the token
+            user.set_password(new_password)
+            user.password_reset_token = None
+            user.password_reset_token_created_at = None
+            user.save()
+
+            messages.success(request, 'Password reset successful. You can now log in with your new password.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Passwords do not match. Please try again.')
+
+    return render(request, 'users/reset_password.html')
+
+# views.py
+# from django.shortcuts import render, redirect
+# from django.shortcuts import render, redirect
+# from django.contrib.auth.decorators import login_required
+# from .models import AdditionalUser
+# from .forms import AdditionalUserForm
+# from .models import AccountManager  # Import the generate_account_id function
+# from django.contrib.auth.decorators import login_required
+# from django.shortcuts import render, redirect
+# from .forms import AdditionalUserForm
+# from .models import AdditionalUser
+
+
+# @login_required(login_url='login')
+# def create_additional_user(request):
+#     current_user = request.user
+
+#     if request.method == 'POST' and current_user.is_authenticated:
+#         form = AdditionalUserForm(request.POST)
+#         if form.is_valid():
+#             additional_user = form.save(commit=False)
+
+#             # Assign the creator (main user)
+#             additional_user.creator = current_user
+
+#             # Generate account_id and assign it
+#             additional_user.account_id = generate_account_id()
+
+#             # Assign additional user details
+#             additional_user.email = current_user.email
+#             additional_user.first_name = current_user.first_name
+#             additional_user.last_name = current_user.last_name
+#             additional_user.username = current_user.username
+#             additional_user.phone_number = current_user.phone_number
+#             additional_user.security_question_1 = current_user.security_question_1
+#             additional_user.security_answer_1 = current_user.security_answer_1
+#             additional_user.security_question_2 = current_user.security_question_2
+#             additional_user.security_answer_2 = current_user.security_answer_2
+
+#             additional_user.save()
+
+#             return redirect('home')  # Replace 'home' with the URL name of your home page
+#     else:
+#         form = AdditionalUserForm()
+
+#     context = {
+#         'form': form,
+#     }
+#     return render(request, 'users/create_additional_user.html', context)
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .forms import AdditionalUserForm
+from .models import AdditionalUser, Account
+   # Assuming you have a utility function for generating account_id
+
+@login_required(login_url='login')
+def create_additional_user(request):
+    current_user = request.user
+
+    if request.method == 'POST' and current_user.is_authenticated:
+        form = AdditionalUserForm(request.POST)
+        if form.is_valid():
+            additional_user = form.save(commit=False)
+            
+            # Generate unique account_id and assign it
+            additional_user.account_id = generate_account_id()
+            
+            additional_account = Account.objects.create(
+                email=additional_user.email,
+                username=additional_user.username,
+                password=additional_user.password,
+                account_id=additional_user.additional_user_id,
+                first_name=additional_user.first_name,
+                last_name=additional_user.last_name,
+                phone_number=additional_user.phone_number,
+                security_question_1=additional_user.security_question_1,
+                security_answer_1=additional_user.security_answer_1,
+                security_question_2=additional_user.security_question_2,
+                security_answer_2=additional_user.security_answer_2,
+            )
+
+            # Save the new Account instance
+            additional_account.save()
+
+            # Assign the new Account instance to the AdditionalUser
+            additional_user.account = additional_account
+            
+            # Assign the creator (main user)
+            additional_user.creator = current_user
+
+            # Save the AdditionalUser
+            additional_user.save()
+            
+            return redirect('patient_dashboard')  # Replace 'home' with the URL name of your home page
+    else:
+        form = AdditionalUserForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'users/create_additional_user.html', context)
+
+
+
+@login_required(login_url='login')
+def display_additional_users(request):
+    current_user = request.user
+    active_additional_users = AdditionalUser.objects.filter(creator=current_user, is_active=True)
+    inactive_additional_users = AdditionalUser.objects.filter(creator=current_user, is_active=False)
+
+    context = {
+        'active_additional_users': active_additional_users,
+        'inactive_additional_users': inactive_additional_users,
+    }
+    return render(request, 'users/m.html', context)
+ 
+def toggle_active(request, additional_user_id):
+    additional_user = get_object_or_404(AdditionalUser, additional_user_id=additional_user_id)
+    additional_user.is_active = not additional_user.is_active
+    additional_user.save()
+    return redirect('patient_dashboard') 
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse
+from .models import AdditionalUser
+
+def upload_file(request, additional_user_id):
+    additional_user = get_object_or_404(AdditionalUser, additional_user_id=additional_user_id)
+    if request.method == 'POST' and request.FILES.get('file'):
+        uploaded_file = request.FILES['file']
+        additional_user.uploaded_file = uploaded_file
+        additional_user.save()
+        # Redirect to the home page or another desired URL
+        return redirect('patient_dashboard')
+
+    return render(request, 'file/upload_file.html', {'additional_user': additional_user})
+
+def download_file(request, additional_user_id):
+    additional_user = get_object_or_404(AdditionalUser, additional_user_id=additional_user_id)
+
+    if additional_user.uploaded_file:
+        file_path = additional_user.uploaded_file.path
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='application/octet-stream')
+            response['Content-Disposition'] = f'attachment; filename={additional_user.uploaded_file.name}'
+            return response
+
+    return HttpResponse("File not found")
+
+# urls.py
+
 
 @login_required(login_url='login')
 def logout(request):
@@ -457,7 +578,6 @@ def logout(request):
     return redirect('home')
 
 @login_required(login_url='login')
-
 def patients_profile(request):
     current_user = request.user
     current_patient = Patient.objects.get(user=current_user)

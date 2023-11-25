@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  .dispaly {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  form {
+    margin-bottom: 20px;
+  }
+
+  button {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  h2, h3 {
+    color: #333;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .counter {
+    color: #777;
+    margin-top: 10px;
+  }
+</style>
+
+<div class="content">
+  <div class="container-fluid">
+    <div class="row">
+      {% include 'users/patientsidenav.html' %}
+
+      <div class="col-md-7 col-lg-8 col-xl-9">
+        <div class="card">
+          <div class="card-body">
+            <h1>Personal Health Records | Manage</h1>
+            <div class="display">
+              <a href="{% url 'create_additional_user' %}">
+                <i class="fas fa-plus-circle"></i> Add New Person
+              </a>
+            </div>
+
+            {% if active_additional_users %}
+              <h3>Active PHR Owners:</h3>
+              <!-- Active Users Table -->
+              <table>
+                <thead>
+                    <th>#</th>
+                    <th>Person</th>
+                    <th>Username</th>
+                    <th>Health Summary</th>
+                    <th>Health trackers</th>
+                    <th>Action</th>
+                  <th>Action</th>
+                </thead>
+                <tbody>
+                  {% for user in active_additional_users %}
+                    <tr>
+                      
+
+                        <td>{{ forloop.counter }}</td>
+                        <td> <a href="#">{{ user.first_name }} {{ user.last_name }}</a></td>
+                        <td>{{ user.username }}</td>
+                        
+                         <td>
+                          {% if user.uploaded_file %}
+                            <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
+                              <i class="fas fa-download"></i> Download
+                            </a>
+                          {% endif %}
+                          <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
+                            <i class="fas fa-upload"></i> Upload
+                          </a>
+                        </td>
+                         <td>
+                          {% if user.uploaded_file %}
+                            <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
+                              <i class="fas fa-download"></i> Download
+                            </a>
+                          {% endif %}
+                          <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
+                            <i class="fas fa-upload"></i> Upload
+                          </a>
+                        </td>
+                        <td>
+                            <a href="#" target="_blank"><i class="fas fa-print"></i></a>
+                            <a href="#"><i class="fas fa-edit"></i></a>
+                            <a href="#"><i class="fas fa-trash-alt"></i></a>
+                          </td>
+                      
+                      <td>
+                        <a href="{% url 'toggle_active' additional_user_id=user.additional_user_id %}">
+                          {% if user.is_active %}
+                            Deactivate
+                          {% else %}
+                            Activate
+                          {% endif %}
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p>No active additional users found.</p>
+            {% endif %}
+
+            {% if inactive_additional_users %}
+              <h3>Inactive PHR Owners:</h3>
+              <!-- Inactive Users Table -->
+              <table>
+                <thead>
+                    <th>#</th>
+                    <th>Person</th>
+                    <th>Username</th>
+                    <th>Health Summary</th>
+                    <th>Health trackers</th>
+                    <th>Action</th>
+                  <th>Action</th>
+                  <!-- New column for active/inactive toggle -->
+                </thead>
+                <tbody>
+                  {% for user in inactive_additional_users %}
+                    <tr>
+                       
+                        <td>{{ forloop.counter }}</td>
+                        <td> <a href="#">{{ user.first_name }} {{ user.last_name }}</a></td>
+                        <td>{{ user.username }}</td>
+                        
+                         <td>
+                          {% if user.uploaded_file %}
+                            <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
+                              <i class="fas fa-download"></i> Download
+                            </a>
+                          {% endif %}
+                          <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
+                            <i class="fas fa-upload"></i> Upload
+                          </a>
+                        </td>
+                         <td>
+                          {% if user.uploaded_file %}
+                            <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
+                              <i class="fas fa-download"></i> Download
+                            </a>
+                          {% endif %}
+                          <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
+                            <i class="fas fa-upload"></i> Upload
+                          </a>
+                        </td>
+                        <td>
+                            <a href="#" target="_blank"><i class="fas fa-print"></i></a>
+                            <a href="#"><i class="fas fa-edit"></i></a>
+                            <a href="#"><i class="fas fa-trash-alt"></i></a>
+                          </td>
+                      <td>
+                        <a href="{% url 'toggle_active' additional_user_id=user.additional_user_id %}">
+                          {% if user.is_active %}
+                            Deactivate
+                          {% else %}
+                            Activate
+                          {% endif %}
+                        </a>
+                      </td>
+                    
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p>No inactive additional users found.</p>
+            {% endif %}
+            {% comment %} <p class="counter">Total users: {{ active_additional_users|length + inactive_additional_users|length }}</p> {% endcomment %}
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+

@@ -101,6 +101,13 @@ class RegistrationForm(forms.ModelForm):
             raise forms.ValidationError("Passwords do not match.")
 
 
+# forms.py
+
+class AdditionalUserForm(forms.ModelForm):
+    class Meta:
+        model = AdditionalUser
+        exclude = ['account_id'] 
+        fields = '__all__'
 
 
 class PatientForm(forms.ModelForm):

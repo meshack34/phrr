@@ -1,0 +1,15 @@
+<!-- create_additional_user.html -->
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="container">
+    <h2>Create Additional User</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Create User</button>
+    </form>
+  </div>
+{% endblock %}

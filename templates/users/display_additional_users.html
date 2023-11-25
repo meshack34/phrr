@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  .dispaly {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  form {
+    margin-bottom: 20px;
+  }
+
+  button {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  h2, h3 {
+    color: #333;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .counter {
+    color: #777;
+    margin-top: 10px;
+  }
+</style>
+
+<div class="content">
+  <div class="container-fluid">
+    <div class="row">
+      {% include 'users/patientsidenav.html' %}
+
+      <div class="col-md-7 col-lg-8 col-xl-9">
+        <div class="card">
+          <div class="card-body">
+            <h1>Personal Health Records | Manage</h1>
+            <div class="dispaly">
+              <a href="{% url 'create_additional_user' %}">
+                <i class="fas fa-plus-circle"></i> Add New Person
+              </a>
+            </div>
+
+            {% if additional_users %}
+              <h3>PHR Owner: {{ additional_users.0.creator.first_name }} || {{ additional_users.0.creator.account_id }} </h3>
+              {% for additional_user in additional_users %}
+                <!-- Display other fields related to additional_user -->
+              {% endfor %}
+            {% else %}
+              <p>No additional users found.</p>
+            {% endif %}
+
+            {% if additional_users %}
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Person</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Action</th>
+                    <th>Health Summary</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for user in additional_users %}
+                    <tr>
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ user.first_name }} {{ user.last_name }}</td>
+                      <td>{{ user.phone_number }}</td>
+                      <td>{{ user.email }}</td>
+                      <td>{{ user.username }}</td>
+                      <td>
+                        <a href="#" target="_blank"><i class="fas fa-print"></i></a>
+                        <a href="#"><i class="fas fa-edit"></i></a>
+                        <a href="#"><i class="fas fa-trash-alt"></i></a>
+                        {% if user.uploaded_file %}
+                          <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
+                            <i class="fas fa-download"></i> Download
+                          </a>
+                        {% endif %}
+                        <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
+                          <i class="fas fa-upload"></i> Upload
+                        </a>
+                      </td>
+                       <td>
+                        <a href="#" target="_blank"><i class="fas fa-print"></i></a>
+                        <a href="#"><i class="fas fa-edit"></i></a>
+                        <a href="#"><i class="fas fa-trash-alt"></i></a>
+                        {% if user.uploaded_file %}
+                          <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
+                            <i class="fas fa-download"></i> Download
+                          </a>
+                        {% endif %}
+                        <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
+                          <i class="fas fa-upload"></i> Upload
+                        </a>
+                      </td>
+                      <td>
+                        <a href="#"><i class="fas fa-plus-circle"></i> More Details</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p>No additional users created yet.</p>
+            {% endif %}
+            <p class="counter">Total users: {{ additional_users|length }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

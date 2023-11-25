@@ -9,7 +9,6 @@ from django.shortcuts import redirect
 from multiselectfield import MultiSelectField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from .models import *
-# Add these imports to the top of your models.py
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 class AccountManager(BaseUserManager):
@@ -133,8 +132,45 @@ class Patient(models.Model):
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
 
+from django.db import models
+from django.contrib.auth import get_user_model
 
+class AdditionalUser(models.Model):
+    creator = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='additional_users_created')
+    additional_user_id = models.CharField(max_length=32, unique=True)  # Use a unique identifier for AdditionalUser
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    # Additional fields for the additional user
+    additional_field_1 = models.CharField(max_length=100, blank=True, null=True)
+    additional_field_2 = models.CharField(max_length=100, blank=True, null=True)
+
+    email = models.EmailField(max_length=100)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    username = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=50)
+    security_question_1 = models.CharField(max_length=100, blank=True, null=True)
+    security_answer_1 = models.CharField(max_length=100, blank=True, null=True)
+    security_question_2 = models.CharField(max_length=100, blank=True, null=True)
+    security_answer_2 = models.CharField(max_length=100, blank=True, null=True)
+    password = models.CharField(max_length=128)  # Store the hashed password
+    uploaded_file = models.FileField(upload_to='uploaded_files/', null=True, blank=True)
+      # Demographics fields
+    age = models.IntegerField(blank=True, null=True)
+    gender = models.CharField(max_length=10, blank=True, null=True)
+    # Add more demographic fields as needed
+
+    is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        self.creator.set_password(self.password)
+        self.creator.save()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Additional User for {self.creator.username}"
+    
 class HealthcareSpecialty(models.Model):
     name = models.CharField(max_length=100)
     def __str__(self):

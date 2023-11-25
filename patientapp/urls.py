@@ -10,9 +10,19 @@ urlpatterns = [
     path('patients_profile/', views.patients_profile, name='patients_profile'),
     path('patients_profile/', views.patients_profile, name='patients_profile'),
     path('recover_account_id/', views.recover_account_id, name='recover_account_id'),
-    path('password_recovery/', views.password_recovery, name='password_recovery'),
-    path('account_recovery/', views.account_recovery, name='account_recovery'),
+    # path('password_recovery/', views.password_recovery, name='password_recovery'),
+    path('account_recovery/', views.account_recovery, name='account_recovery'),    
+    path('forgot_password/', views.forgot_password, name='forgot_password'),
+    path('reset_password/<str:email_b64>/<str:token>/', views.reset_password, name='reset_password'),
+    path('create_additional_user/', views.create_additional_user, name='create_additional_user'),
+    path('display_additional_users/', views.display_additional_users, name='display_additional_users'),
     
+    path('upload/<str:additional_user_id>/', views.upload_file, name='upload_file'),
+    path('download/<str:additional_user_id>/', views.download_file, name='download_file'),
+    path('toggle_active/<str:additional_user_id>/', views.toggle_active, name='toggle_active'),
+
+   
+
     path('manage_emergency_contact/', views.manage_emergency_contact, name='manage_emergency_contact'),
     
     path('add/', views.add_healthcare_speciality, name='add_healthcare_speciality'),
