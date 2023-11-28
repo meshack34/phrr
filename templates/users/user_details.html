@@ -1,0 +1,126 @@
+<!-- users/user_details.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  /* Add any specific styles for user details page */
+  .user-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  .user-details-table th, .user-details-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .user-details-table th {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .user-details-table td.first-column {
+    width: 30%;
+  }
+</style>
+
+<div class="content">
+  <div class="container-fluid">
+    <div class="row">
+      {% include 'users/patientsidenav.html' %}
+
+      <div class="col-md-7 col-lg-8 col-xl-9">
+        <div class="card">
+          <div class="card-body">
+            <h1>User Details</h1>
+
+            <!-- User Details Table -->
+            <table class="user-details-table">
+              <tbody>
+                <tr>
+                  <td class="first-column">Username:</td>
+                  <td>{{ user.username }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Email:</td>
+                  <td>{{ user.email }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">First Name:</td>
+                  <td>{{ user.first_name }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Last Name:</td>
+                  <td>{{ user.last_name }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Phone Number:</td>
+                  <td>{{ user.phone_number }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Age:</td>
+                  <td>{{ user.age }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Gender:</td>
+                  <td>{{ user.gender }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Security Question 1:</td>
+                  <td>{{ user.security_question_1 }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Security Answer 1:</td>
+                  <td>{{ user.security_answer_1 }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Security Question 2:</td>
+                  <td>{{ user.security_question_2 }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Security Answer 2:</td>
+                  <td>{{ user.security_answer_2 }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Uploaded File:</td>
+                  {% if user.uploaded_file %}
+                    <td><a href="{{ user.uploaded_file.url }}" target="_blank">{{ user.uploaded_file.name }}</a></td>
+                  {% else %}
+                    <td>No file uploaded</td>
+                  {% endif %}
+                </tr>
+                <tr>
+                  <td class="first-column">Additional Field 1:</td>
+                  <td>{{ user.additional_field_1 }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Additional Field 2:</td>
+                  <td>{{ user.additional_field_2 }}</td>
+                </tr>
+                <tr>
+                  <td class="first-column">Doctor's Form:</td>
+                  <td><a href="{% url 'doctor_note_form' additional_user_id=user.id %}">Go to Doctor's Form</a></td>
+                </tr>
+                <tr>
+                  <td class="first-column">Generate PDF:</td>
+                  <td>
+                    {% if user.doctor_notes.exists %}
+                      <a href="{% url 'generate_pdf' doctor_note_id=user.doctor_notes.last.id %}">Generate PDF</a>
+                    {% else %}
+                      No doctor notes available
+                    {% endif %}
+                  </td>
+                </tr>
+                <!-- Add more fields as needed -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

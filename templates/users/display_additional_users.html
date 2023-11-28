@@ -70,8 +70,9 @@
             </div>
 
             {% if additional_users %}
-              <h3>PHR Owner: {{ additional_users.0.creator.first_name }} || {{ additional_users.0.creator.account_id }} </h3>
               {% for additional_user in additional_users %}
+              
+              <h3>PHR Owner: {{ additional_users.0.creator.first_name }} || {{ additional_users.0.creator.account_id }} </h3>
                 <!-- Display other fields related to additional_user -->
               {% endfor %}
             {% else %}

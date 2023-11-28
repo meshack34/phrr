@@ -108,6 +108,13 @@ class AdditionalUserForm(forms.ModelForm):
         model = AdditionalUser
         exclude = ['account_id'] 
         fields = '__all__'
+from django import forms
+from .models import DoctorNote
+
+class DoctorNoteForm(forms.ModelForm):
+    class Meta:
+        model = DoctorNote
+        fields = '__all__'
 
 
 class PatientForm(forms.ModelForm):

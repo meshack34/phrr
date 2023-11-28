@@ -2,24 +2,21 @@ from django.utils.http import urlsafe_base64_decode
 from django.template.loader import get_template
 from django.http import HttpResponse, HttpResponseServerError
 from xhtml2pdf import pisa
-from django.shortcuts import (render, redirect, get_object_or_404,)
 from .models import *
 from django.shortcuts import render, redirect
 from .models import MedicalHistory, TreatmentRecord
 from .forms import MedicalHistoryForm, TreatmentRecordForm
 from .models import Patient
 from django.urls import path
-
-
-from django.contrib import messages
-
+from django.shortcuts import render, redirect
+from django.views.generic.edit import CreateView
+from .models import AdditionalUser
+from .forms import AdditionalUserForm
 from django.contrib.auth import authenticate, login as auth_login
 from .models import Account, Patient
-
 from django.contrib import messages
 from .forms import VitalsForm
 from .models import Vitals
-
 from django.contrib import messages
 from .forms import NEWMedicalHistoryForm
 from django.shortcuts import render, redirect, get_object_or_404
@@ -127,13 +124,6 @@ def generate_account_id():
 
     return account_id
 
-# def generate_account_id():
-#     length = 8 
-#     first_char = random.choice(string.ascii_letters)  # Start with a letter
-#     account_id = [first_char] + random.choices(string.ascii_letters + string.digits + '_', k=length - 1)
-#     account_id = ''.join(account_id)
-#     return account_id
-
 def send_sms_verification(phone_number, account_id):
     account_sid = "ACc319ba45a57855df8b48288ff7f8bf55"
     auth_token = "3819ffd7803c5ff00cfa03d98283ec3f"
@@ -152,9 +142,9 @@ def send_email_verification(email, account_id):
     from_email = 'meshackkimutai34@gmail.com'  
     recipient_list = [email]
     send_mail(subject, message, from_email, recipient_list)
+    
 
 def patient_register(request):
-    if True:
         if request.method == 'POST':
             form = RegistrationForm(request.POST)
             if form.is_valid():
@@ -209,35 +199,7 @@ def patient_register(request):
             'form': form
         }
         return render(request, 'users/register.html', context)
-    # except Exception as e:
-    #     # Log the exception for debugging purposes
-    #     print(f"Error during registration: {str(e)}")
 
-    #     # Display a generic error message to the user
-    #     messages.error(request, 'An error occurred during registration. Please try again later.')
-    #     return HttpResponseServerError('Internal Server Error')
-
-# views.py
-from django.shortcuts import render, redirect
-from django.views.generic.edit import CreateView
-from .models import AdditionalUser
-from .forms import AdditionalUserForm
-
-class AdditionalUserCreateView(CreateView):
-    model = AdditionalUser
-    form_class = AdditionalUserForm
-    template_name = 'users/add_additional_user.html'
-
-    def form_valid(self, form):
-        form.instance.creator = self.request.user
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return '/success/'  # Redirect to a success page or adjust as needed
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login
-from django.contrib import messages
-from .models import Account, Patient
 
 def user_login(request):
     if request.method == 'POST':
@@ -263,30 +225,6 @@ def user_login(request):
 
     return render(request, 'users/login.html')
 
-
-# def user_login(request):
-#     if request.method == 'POST':
-#         account_id = request.POST['account_id']
-#         password = request.POST['password']
-
-#         user = authenticate(account_id=account_id, password=password)
-        
-#         if user is not None:
-#             auth_login(request, user)
-#             current_user = Account.objects.get(id=request.user.id)
-#             patient_exists = Patient.objects.filter(user=current_user).exists()
-
-#             if patient_exists:
-#                 return redirect('patient_dashboard')
-#             else:
-#                 patient = Patient(user=current_user)
-#                 patient.save()
-#                 return redirect('patient_dashboard')
-#         else:
-#             messages.success(request, 'Invalid Credentials')
-#             return redirect('login')
-
-#     return render(request, 'users/login.html')
 
 
 
@@ -417,55 +355,7 @@ def reset_password(request, email_b64, token):
 
     return render(request, 'users/reset_password.html')
 
-# views.py
-# from django.shortcuts import render, redirect
-# from django.shortcuts import render, redirect
-# from django.contrib.auth.decorators import login_required
-# from .models import AdditionalUser
-# from .forms import AdditionalUserForm
-# from .models import AccountManager  # Import the generate_account_id function
-# from django.contrib.auth.decorators import login_required
-# from django.shortcuts import render, redirect
-# from .forms import AdditionalUserForm
-# from .models import AdditionalUser
 
-
-# @login_required(login_url='login')
-# def create_additional_user(request):
-#     current_user = request.user
-
-#     if request.method == 'POST' and current_user.is_authenticated:
-#         form = AdditionalUserForm(request.POST)
-#         if form.is_valid():
-#             additional_user = form.save(commit=False)
-
-#             # Assign the creator (main user)
-#             additional_user.creator = current_user
-
-#             # Generate account_id and assign it
-#             additional_user.account_id = generate_account_id()
-
-#             # Assign additional user details
-#             additional_user.email = current_user.email
-#             additional_user.first_name = current_user.first_name
-#             additional_user.last_name = current_user.last_name
-#             additional_user.username = current_user.username
-#             additional_user.phone_number = current_user.phone_number
-#             additional_user.security_question_1 = current_user.security_question_1
-#             additional_user.security_answer_1 = current_user.security_answer_1
-#             additional_user.security_question_2 = current_user.security_question_2
-#             additional_user.security_answer_2 = current_user.security_answer_2
-
-#             additional_user.save()
-
-#             return redirect('home')  # Replace 'home' with the URL name of your home page
-#     else:
-#         form = AdditionalUserForm()
-
-#     context = {
-#         'form': form,
-#     }
-#     return render(request, 'users/create_additional_user.html', context)
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -521,8 +411,6 @@ def create_additional_user(request):
     return render(request, 'users/create_additional_user.html', context)
 
 
-
-@login_required(login_url='login')
 def display_additional_users(request):
     current_user = request.user
     active_additional_users = AdditionalUser.objects.filter(creator=current_user, is_active=True)
@@ -532,8 +420,172 @@ def display_additional_users(request):
         'active_additional_users': active_additional_users,
         'inactive_additional_users': inactive_additional_users,
     }
-    return render(request, 'users/m.html', context)
- 
+    return render(request, 'users/patient_dashboard.html', context)
+
+
+
+@login_required(login_url='login')
+def patient_dashboard(request):
+    current_user = request.user
+    active_additional_users = AdditionalUser.objects.filter(creator=current_user, is_active=True)
+    inactive_additional_users = AdditionalUser.objects.filter(creator=current_user, is_active=False)
+
+    context = {
+        'active_additional_users': active_additional_users,
+        'inactive_additional_users': inactive_additional_users,
+    }
+    return render(request, 'users/patient_dashboard.html', context)
+
+from django.shortcuts import render, get_object_or_404
+from .models import AdditionalUser
+
+from django.shortcuts import render, get_object_or_404
+from django.http import Http404
+from .models import AdditionalUser
+
+# def user_details(request, additional_user_id):
+#     try:
+#         additional_user_id = int(additional_user_id)
+#         user = get_object_or_404(AdditionalUser, id=additional_user_id)
+#     except ValueError:
+#         raise Http404("Invalid additional_user_id")
+
+#     return render(request, 'users/user_details.html', {'user': user})
+
+# views.py
+# views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+from .forms import DoctorNoteForm
+from .models import AdditionalUser, DoctorNote
+# patientapp/views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
+from .forms import DoctorNoteForm
+from .models import AdditionalUser, DoctorNote
+
+def doctor_note_form(request, additional_user_id):
+    try:
+        additional_user_id = int(additional_user_id)
+        user = get_object_or_404(AdditionalUser, id=additional_user_id)
+
+        if request.method == 'POST':
+            form = DoctorNoteForm(request.POST)
+            if form.is_valid():
+                doctor_note = form.save(commit=False)
+                doctor_note.additional_user = user
+                doctor_note.save()
+                return redirect('patient_dashboard')
+
+        else:
+            form = DoctorNoteForm()
+
+        context = {
+            'form': form,
+            'user': user,
+        }
+        return render(request, 'users/doctor_note_form.html', context)
+
+    except ValueError:
+        return render(request, 'users/invalid_user_id.html')
+
+def submit_doctor_note(request):
+    return redirect('patient_dashboard')
+
+
+def generate_pdf(request, doctor_note_id):
+    doctor_note = get_object_or_404(DoctorNote, id=doctor_note_id)
+    pdf = render_to_pdf('users/doctor_note_form_pdf.html', {'doctor_note': doctor_note})
+
+    if pdf:
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename=doctor_note_{doctor_note.id}.pdf'
+        response.write(pdf)
+
+        return response
+    else:
+        return HttpResponse("Error generating PDF", status=500)
+
+def user_details(request, additional_user_id):
+    try:
+        additional_user_id = int(additional_user_id)
+        user = get_object_or_404(AdditionalUser, id=additional_user_id)
+    except ValueError:
+        raise Http404("Invalid additional_user_id")
+
+    return render(request, 'users/user_details.html', {'user': user})
+
+def render_to_pdf(template_path, context):
+    template_str = render_to_string(template_path, context)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="report.pdf"'
+    pisa_status = pisa.CreatePDF(template_str, dest=response)
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + template_str + '</pre>')
+    return response
+
+
+
+  # Import your generate_pdf function
+
+# def doctor_note_form(request, additional_user_id):
+#     try:
+#         additional_user_id = int(additional_user_id)
+#         user = get_object_or_404(AdditionalUser, id=additional_user_id)
+
+#         if request.method == 'POST':
+#             form = DoctorNoteForm(request.POST)
+#             if form.is_valid():
+#                 doctor_note = form.save(commit=False)
+#                 doctor_note.additional_user = user
+#                 doctor_note.save()
+
+#                 # Generate PDF with the doctor_note_id
+#                 pdf_buffer = generate_pdf(doctor_note.id)
+
+#                 # Create an HttpResponse with the PDF content
+#                 response = HttpResponse(content_type='application/pdf')
+#                 response['Content-Disposition'] = f'attachment; filename=doctor_note_{doctor_note.id}.pdf'
+#                 response.write(pdf_buffer.read())
+
+#                 return response
+#         else:
+#             form = DoctorNoteForm()
+
+#         context = {
+#             'form': form,
+#             'user': user,
+#         }
+#         return render(request, 'users/doctor_note_form.html', context)
+#     except ValueError:
+#         return render(request, 'users/invalid_user_id.html')
+
+# # utils.py
+# from reportlab.pdfgen import canvas
+# from io import BytesIO
+# from .models import DoctorNote  # Import your DoctorNote model
+
+# def generate_pdf(doctor_note_id):
+#     doctor_note = DoctorNote.objects.get(id=doctor_note_id)
+#     buffer = BytesIO()
+#     pdf = canvas.Canvas(buffer)
+
+#     # PDF content generation
+#     pdf.drawString(100, 800, f"Doctor's Note for {doctor_note.additional_user}")
+#     pdf.drawString(100, 780, f"Date: {doctor_note.date}")
+#     pdf.drawString(100, 760, f"Diagnosis: {doctor_note.diagnosis}")
+#     # Add more fields as needed
+
+#     pdf.showPage()
+#     pdf.save()
+
+#     buffer.seek(0)
+#     return buffer
+
+
+
 def toggle_active(request, additional_user_id):
     additional_user = get_object_or_404(AdditionalUser, additional_user_id=additional_user_id)
     additional_user.is_active = not additional_user.is_active
@@ -1393,32 +1445,6 @@ def doctor_dashboard(request):
 
     return render(request,'users/doctor_dashboard.html', context)
 
-def patient_dashboard(request):
-    current_user = request.user
-    current_patient = get_object_or_404(Patient, user=current_user)
-
-    current_appointment = MedicalHistoryy.objects.filter(patient=current_patient) 
-    print(current_appointment)
-    prescription = Prescription.objects.filter(patient=current_patient)
-
-    prescription_status = PrescriptionStatus.objects.filter(patient=current_patient,is_uploaded=True)
-    for status in prescription_status:
-        if status.newprescription:
-            print(status.newprescription.name)
-        else:
-            print("Prescription not found for this status.")
-
-
-    context = {
-        'patient': current_patient,
-        'current_appointment':current_appointment,
-        'prescription':prescription,
-        'prescription_status':prescription_status,
-
-    }
-    return render(request,'users/patient_dashboard.html', context)
-
-
 def status(request, patient_id):
     current_user = request.user
     current_doctor = get_object_or_404(Doctor,user=current_user)
@@ -2072,51 +2098,6 @@ def Medication(request, patient_id):
     except Doctor.DoesNotExist:
         # Handle the case where the doctor does not exist
         return HttpResponseBadRequest("Doctor not found")
-
-# def Medication(request, patient_id):
-#     try:
-#         current_user = request.user
-#         patient = get_object_or_404(Patient, id=patient_id)
-#         current_doctor = get_object_or_404(Doctor, user=current_user)
-
-#         # Check if the current doctor has the medical history of the patient
-#         doctor_for_patient = MedicalHistoryy.objects.get(patient=patient, doctor=current_doctor)
-#         accepted_patient = MedicalHistoryy.objects.get(id=patient_id)
-#         speciality = DoctorSpecialization.objects.get(doctor=current_doctor)
-
-#         if request.method == 'POST':
-#             form = MedicalTreatmentForm(request.POST)
-#             if form.is_valid():
-#                 # Save the form with the current patient and doctor
-#                 medical_history = form.save(commit=False)
-#                 medical_history.save()
-                
-#                 # Handle the many-to-many relationships with selected checkboxes
-#                 form.save_m2m()
-
-#                 messages.success(request, f'Successfully Added Medical History for {patient}')
-#                 return redirect('home')
-#         else:
-#             form = MedicalTreatmentForm(initial={'patient': patient})
-
-#         context = {
-#             'form': form,
-#             'current_patient': patient,
-#             'doctor_for_patient': doctor_for_patient,
-#             'current_doctor': current_doctor,
-#             'speciality': speciality,
-#             'accepted_patient': accepted_patient,
-#         }
-
-#         return render(request, 'documents/medical_history_form.html', context)
-
-#     except Patient.DoesNotExist:
-#         # Handle the case where the patient does not exist
-#         return HttpResponseBadRequest("Patient not found")
-#     except Doctor.DoesNotExist:
-#         # Handle the case where the doctor does not exist
-#         return HttpResponseBadRequest("Doctor not found")
-
 
 
 def generate_medical_treatment_pdf(request, patient_id):

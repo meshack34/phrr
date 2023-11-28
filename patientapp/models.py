@@ -56,10 +56,10 @@ class AccountManager(BaseUserManager):
             return None
         
 class Account(AbstractBaseUser):
-    email           = models.EmailField(max_length=100, unique=True)
+    email           = models.EmailField(max_length=100)
     first_name      = models.CharField(max_length=50)
     last_name       = models.CharField(max_length=50)
-    username        = models.CharField(max_length=50, unique=True)
+    username        = models.CharField(max_length=50)
     phone_number    = models.CharField(max_length=50)
     date_joined     = models.DateTimeField(auto_now_add=True)
     last_login      = models.DateTimeField(auto_now_add=True)
@@ -170,7 +170,30 @@ class AdditionalUser(models.Model):
 
     def __str__(self):
         return f"Additional User for {self.creator.username}"
-    
+
+from django.db import models
+from .models import AdditionalUser
+
+class DoctorNote(models.Model):
+    additional_user = models.ForeignKey(AdditionalUser, on_delete=models.CASCADE, related_name='doctor_notes')
+    name = models.CharField(max_length=100)
+    age = models.IntegerField()
+    date = models.DateField()
+    diagnosis = models.TextField()
+    duration_on_dialysis = models.CharField(max_length=50)
+    current_medication = models.TextField()
+    general_status = models.CharField(max_length=50)
+    access_site_status = models.CharField(max_length=50)
+    bp = models.CharField(max_length=20)
+    qb_rate = models.CharField(max_length=20)
+    ultrafiltration_volume = models.CharField(max_length=20)
+    investigations = models.TextField()
+    plan = models.TextField()
+
+    def __str__(self):
+        return f"Doctor's Note for {self.additional_user}"
+
+  
 class HealthcareSpecialty(models.Model):
     name = models.CharField(max_length=100)
     def __str__(self):

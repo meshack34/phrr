@@ -14,8 +14,25 @@ urlpatterns = [
     path('account_recovery/', views.account_recovery, name='account_recovery'),    
     path('forgot_password/', views.forgot_password, name='forgot_password'),
     path('reset_password/<str:email_b64>/<str:token>/', views.reset_password, name='reset_password'),
+    
     path('create_additional_user/', views.create_additional_user, name='create_additional_user'),
     path('display_additional_users/', views.display_additional_users, name='display_additional_users'),
+    # path('user_details/<str:additional_user_id>/', views.user_details, name='user_details'),
+    # path('doctor_note_form/<str:additional_user_id>/', views.doctor_note_form, name='doctor_note_form'),
+    # path('generate_pdf/<int:doctor_note_id>/', views.generate_pdf, name='generate_pdf'),
+    
+    # path('doctor_note_form/<int:additional_user_id>/', views.doctor_note_form, name='doctor_note_form'),
+    # path('generate_pdf/<int:doctor_note_id>/', views.render_to_pdf, name='generate_pdf'),
+    # path('user_details/<int:additional_user_id>/', views.user_details, name='user_details'),
+ 
+ 
+ 
+    path('doctor_note_form/<int:additional_user_id>/', views.doctor_note_form, name='doctor_note_form'),
+    path('generate_pdf/<int:doctor_note_id>/', views.generate_pdf, name='generate_pdf'),
+    path('user_details/<int:additional_user_id>/', views.user_details, name='user_details'),
+    path('submit_doctor_note/', views.submit_doctor_note, name='submit_doctor_note'),  # Add this line
+   
+
     
     path('upload/<str:additional_user_id>/', views.upload_file, name='upload_file'),
     path('download/<str:additional_user_id>/', views.download_file, name='download_file'),
