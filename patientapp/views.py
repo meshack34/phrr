@@ -129,10 +129,10 @@ def generate_account_id():
 
 
 def send_sms_verification(phone_number, account_id):
-    account_sid = "ACc319ba45a57855df8b48288ff7f8bf55"
-    auth_token = "7d2399b330b92f44bd192206d624f871"
+    account_sid = "AC3bac06f325e90b66ced3c2b641b08f7a"
+    auth_token = "6179783769e2adf93c9b3361b9ccf929"
     client = Client(account_sid, auth_token)
-    twilio_phone_number = "+18123385322"
+    twilio_phone_number = "+15108582603"
     message = client.messages.create(
         body=f"Your account ID is {account_id}",
         from_=twilio_phone_number,
