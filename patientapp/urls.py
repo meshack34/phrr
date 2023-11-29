@@ -20,21 +20,10 @@ urlpatterns = [
     
     path('discharge-form/', views.discharge_form, name='discharge_form'),
 
-   
-    # path('user_details/<str:additional_user_id>/', views.user_details, name='user_details'),
-    # path('doctor_note_form/<str:additional_user_id>/', views.doctor_note_form, name='doctor_note_form'),
-    # path('generate_pdf/<int:doctor_note_id>/', views.generate_pdf, name='generate_pdf'),
-    
-    # path('doctor_note_form/<int:additional_user_id>/', views.doctor_note_form, name='doctor_note_form'),
-    # path('generate_pdf/<int:doctor_note_id>/', views.render_to_pdf, name='generate_pdf'),
-    # path('user_details/<int:additional_user_id>/', views.user_details, name='user_details'),
+  
  
- 
-    path('discharge_form/', views.discharge_form, name='discharge_form'),
     path('doctor_note_form/<int:additional_user_id>/', views.doctor_note_form, name='doctor_note_form'),
-    path('generate_pdf/<int:doctor_note_id>/', views.generate_pdf, name='generate_pdf'),
     path('user_details/<int:additional_user_id>/', views.user_details, name='user_details'),
-    path('submit_doctor_note/', views.submit_doctor_note, name='submit_doctor_note'),  # Add this line
    
 
     

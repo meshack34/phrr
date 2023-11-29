@@ -108,7 +108,15 @@
                         </a>
                       </td>
                       
-                    <td><a href="{% url 'doctor_note_form' additional_user_id=user.additional_user_id %}">Doctor Notes</a></td>
+                    <td><a href="{% url 'doctor_note_form' additional_user_id=user.additional_user_id %}">Doctor Notes</a>
+                      {% if user.uploaded_file %}
+                          <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
+                            <i class="fas fa-download"></i> Download
+                          </a>
+                        {% endif %}
+                        <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
+                          <i class="fas fa-upload"></i> Upload
+                        </a></td>
                  <td>
                         {% if user.uploaded_file %}
                           <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>

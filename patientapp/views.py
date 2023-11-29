@@ -443,6 +443,41 @@ def display_additional_users(request):
     return render(request, 'users/patient_dashboard.html', context)
 
 
+def toggle_active(request, additional_user_id):
+    additional_user = get_object_or_404(AdditionalUser, additional_user_id=additional_user_id)
+    additional_user.is_active = not additional_user.is_active
+    additional_user.save()
+    return redirect('patient_dashboard') 
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse
+from .models import AdditionalUser
+
+def upload_file(request, additional_user_id):
+    additional_user = get_object_or_404(AdditionalUser, additional_user_id=additional_user_id)
+    if request.method == 'POST' and request.FILES.get('file'):
+        uploaded_file = request.FILES['file']
+        additional_user.uploaded_file = uploaded_file
+        additional_user.save()
+        # Redirect to the home page or another desired URL
+        return redirect('patient_dashboard')
+
+    return render(request, 'file/upload_file.html', {'additional_user': additional_user})
+
+def download_file(request, additional_user_id):
+    additional_user = get_object_or_404(AdditionalUser, additional_user_id=additional_user_id)
+
+    if additional_user.uploaded_file:
+        file_path = additional_user.uploaded_file.path
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='application/octet-stream')
+            response['Content-Disposition'] = f'attachment; filename={additional_user.uploaded_file.name}'
+            return response
+
+    return HttpResponse("File not found")
+
+
 
 @login_required(login_url='login')
 def patient_dashboard(request):
@@ -456,25 +491,9 @@ def patient_dashboard(request):
     }
     return render(request, 'users/patient_dashboard.html', context)
 
-from django.shortcuts import render, get_object_or_404
-from .models import AdditionalUser
 
-from django.shortcuts import render, get_object_or_404
 from django.http import Http404
 from .models import AdditionalUser
-
-# def user_details(request, additional_user_id):
-#     try:
-#         additional_user_id = int(additional_user_id)
-#         user = get_object_or_404(AdditionalUser, id=additional_user_id)
-#     except ValueError:
-#         raise Http404("Invalid additional_user_id")
-
-#     return render(request, 'users/user_details.html', {'user': user})
-
-# views.py
-# views.py
-from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
@@ -511,22 +530,7 @@ def doctor_note_form(request, additional_user_id):
     except ValueError:
         return render(request, 'users/invalid_user_id.html')
 
-def submit_doctor_note(request):
-    return redirect('patient_dashboard')
 
-
-def generate_pdf(request, doctor_note_id):
-    doctor_note = get_object_or_404(DoctorNote, id=doctor_note_id)
-    pdf = render_to_pdf('users/doctor_note_form_pdf.html', {'doctor_note': doctor_note})
-
-    if pdf:
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename=doctor_note_{doctor_note.id}.pdf'
-        response.write(pdf)
-
-        return response
-    else:
-        return HttpResponse("Error generating PDF", status=500)
 
 def user_details(request, additional_user_id):
     try:
@@ -548,41 +552,6 @@ def render_to_pdf(template_path, context):
 
 
 
-def toggle_active(request, additional_user_id):
-    additional_user = get_object_or_404(AdditionalUser, additional_user_id=additional_user_id)
-    additional_user.is_active = not additional_user.is_active
-    additional_user.save()
-    return redirect('patient_dashboard') 
-
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
-from .models import AdditionalUser
-
-def upload_file(request, additional_user_id):
-    additional_user = get_object_or_404(AdditionalUser, additional_user_id=additional_user_id)
-    if request.method == 'POST' and request.FILES.get('file'):
-        uploaded_file = request.FILES['file']
-        additional_user.uploaded_file = uploaded_file
-        additional_user.save()
-        # Redirect to the home page or another desired URL
-        return redirect('patient_dashboard')
-
-    return render(request, 'file/upload_file.html', {'additional_user': additional_user})
-
-def download_file(request, additional_user_id):
-    additional_user = get_object_or_404(AdditionalUser, additional_user_id=additional_user_id)
-
-    if additional_user.uploaded_file:
-        file_path = additional_user.uploaded_file.path
-        with open(file_path, 'rb') as f:
-            response = HttpResponse(f.read(), content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename={additional_user.uploaded_file.name}'
-            return response
-
-    return HttpResponse("File not found")
-
-# urls.py
 
 
 @login_required(login_url='login')
