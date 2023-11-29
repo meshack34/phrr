@@ -213,6 +213,15 @@ class VitalsForm(forms.ModelForm):
 # forms.py
 
 # forms.py
+# forms.py
+
+from django import forms
+from .models import PatientDischarge
+
+class PatientDischargeForm(forms.ModelForm):
+    class Meta:
+        model = PatientDischarge
+        exclude = []  # You can exclude fields if needed
 
 from django import forms
 from .models import Exercise, Dietary, Smoking, Alcohol, Medications, Lifestyle

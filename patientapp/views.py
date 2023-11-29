@@ -126,9 +126,9 @@ def generate_account_id():
 
 def send_sms_verification(phone_number, account_id):
     account_sid = "ACc319ba45a57855df8b48288ff7f8bf55"
-    auth_token = "3819ffd7803c5ff00cfa03d98283ec3f"
+    auth_token = "7d2399b330b92f44bd192206d624f871"
     client = Client(account_sid, auth_token)
-    twilio_phone_number = "+16066180215"
+    twilio_phone_number = "+18123385322"
     message = client.messages.create(
         body=f"Your account ID is {account_id}",
         from_=twilio_phone_number,
@@ -156,7 +156,6 @@ def patient_register(request):
                 password = form.cleaned_data['password']
                 security_question_1 = form.cleaned_data['security_question_1']
                 security_answer_1 = form.cleaned_data['security_answer_1']
-
                 security_question_2 = form.cleaned_data['security_question_2']
                 security_answer_2 = form.cleaned_data['security_answer_2']
 
@@ -255,10 +254,28 @@ def recover_account_id(request):
         return render(request, 'users/account_recovery.html')
 
 # views.py
+# views.py
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import Account
+from .forms import PatientDischargeForm
+from django.shortcuts import render
+from .forms import PatientDischargeForm
+from django.template.loader import get_template
+from django.http import HttpResponse
+
+
+def discharge_form(request):
+    if request.method == 'POST':
+        form = PatientDischargeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('success_page')  # Redirect to a success page
+    else:
+        form = PatientDischargeForm()
+
+    return render(request, 'discharge_form_pdf.html', {'form': form})
+
+# views.p
+
 
 def account_recovery(request):
     if request.method == 'POST':
@@ -525,64 +542,6 @@ def render_to_pdf(template_path, context):
     if pisa_status.err:
         return HttpResponse('We had some errors <pre>' + template_str + '</pre>')
     return response
-
-
-
-  # Import your generate_pdf function
-
-# def doctor_note_form(request, additional_user_id):
-#     try:
-#         additional_user_id = int(additional_user_id)
-#         user = get_object_or_404(AdditionalUser, id=additional_user_id)
-
-#         if request.method == 'POST':
-#             form = DoctorNoteForm(request.POST)
-#             if form.is_valid():
-#                 doctor_note = form.save(commit=False)
-#                 doctor_note.additional_user = user
-#                 doctor_note.save()
-
-#                 # Generate PDF with the doctor_note_id
-#                 pdf_buffer = generate_pdf(doctor_note.id)
-
-#                 # Create an HttpResponse with the PDF content
-#                 response = HttpResponse(content_type='application/pdf')
-#                 response['Content-Disposition'] = f'attachment; filename=doctor_note_{doctor_note.id}.pdf'
-#                 response.write(pdf_buffer.read())
-
-#                 return response
-#         else:
-#             form = DoctorNoteForm()
-
-#         context = {
-#             'form': form,
-#             'user': user,
-#         }
-#         return render(request, 'users/doctor_note_form.html', context)
-#     except ValueError:
-#         return render(request, 'users/invalid_user_id.html')
-
-# # utils.py
-# from reportlab.pdfgen import canvas
-# from io import BytesIO
-# from .models import DoctorNote  # Import your DoctorNote model
-
-# def generate_pdf(doctor_note_id):
-#     doctor_note = DoctorNote.objects.get(id=doctor_note_id)
-#     buffer = BytesIO()
-#     pdf = canvas.Canvas(buffer)
-
-#     # PDF content generation
-#     pdf.drawString(100, 800, f"Doctor's Note for {doctor_note.additional_user}")
-#     pdf.drawString(100, 780, f"Date: {doctor_note.date}")
-#     pdf.drawString(100, 760, f"Diagnosis: {doctor_note.diagnosis}")
-#     # Add more fields as needed
-
-#     pdf.showPage()
-#     pdf.save()
-
-#     buffer.seek(0)
-#     return buffer
 
 
 

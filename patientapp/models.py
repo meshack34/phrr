@@ -132,6 +132,37 @@ class Patient(models.Model):
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
 
+# models.py
+
+from django.db import models
+
+class PatientDischarge(models.Model):
+    facility = models.CharField(max_length=200)
+    date_time = models.DateTimeField()
+    patient_name = models.CharField(max_length=200)
+    age = models.IntegerField()
+    gender = models.CharField(max_length=10)
+    date_of_admission = models.DateField()
+    date_of_discharge = models.DateField()
+    discharge_diagnosis = models.TextField()
+    procedures_and_therapies = models.TextField(null=True, blank=True)
+    complications = models.TextField()
+    consultations = models.TextField()
+    patient_history = models.TextField()
+    lab = models.TextField()
+    condition_of_discharge = models.TextField()
+    dispositions = models.TextField()
+    discharge_to = models.TextField()
+    diet = models.TextField()
+    activity = models.TextField()
+    dme = models.TextField()
+    home_health_services = models.TextField()
+    fu_apts = models.TextField(null=True, blank=True)
+    meds = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.patient_name
+
 from django.db import models
 from django.contrib.auth import get_user_model
 
