@@ -111,18 +111,22 @@ import random
 import string
 from .models import Account
 
+import random
+import string
+from django.db.models import Max
+from .models import Account  # Assuming your Account model is in a file named models.py
+
 def generate_account_id():
     length = 8 
     while True:
-        first_char = random.choice(string.ascii_letters)  # Start with a letter
-        account_id = [first_char] + random.choices(string.ascii_letters + string.digits + '_', k=length - 1)
-        account_id = ''.join(account_id)
-
-        # Check if the generated account_id already exists
+        first_chars = "Acc" + ''.join(random.choices(string.ascii_letters, k=length - 4))
+        last_digits = str(random.randint(0, 999)).zfill(3)
+        account_id = first_chars + last_digits
         if not Account.objects.filter(account_id=account_id).exists():
             break
 
     return account_id
+
 
 def send_sms_verification(phone_number, account_id):
     account_sid = "ACc319ba45a57855df8b48288ff7f8bf55"
@@ -148,7 +152,6 @@ def patient_register(request):
         if request.method == 'POST':
             form = RegistrationForm(request.POST)
             if form.is_valid():
-                # Extract cleaned data from the form
                 first_name = form.cleaned_data['first_name']
                 last_name = form.cleaned_data['last_name']
                 phone_number = form.cleaned_data['phone_number']
