@@ -25,6 +25,63 @@
   .user-details-table td.first-column {
     width: 30%;
   }
+  
+  .user-details-row {
+    margin-top: 20px;
+  }
+  
+  .user-details-col {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .user-details-forms {
+    margin-top: 20px;
+  }
+
+  table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+  }
+
+  th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+  }
+
+  th {
+      background-color: #f2f2f2;
+  }
+
+  td a {
+      display: block;
+      text-decoration: none;
+      color: #007BFF;
+  }
+
+  td a:hover {
+      color: #0056b3;
+  }
+
+  form {
+      display: flex;
+      align-items: center;
+  }
+
+  button {
+      margin-left: 10px;
+      padding: 8px 12px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+  }
+
+  button:hover {
+      background-color: #0056b3;
+  }
 </style>
 
 <div class="content">
@@ -37,87 +94,194 @@
           <div class="card-body">
             <h1>User Details</h1>
 
-            <!-- User Details Table -->
+            <!-- First Row: User Information -->
+            <div class="user-details-row">
+              <div class="user-details-col">
+                <!-- First Column: Profile Pic, Name, Username, Email -->
+                <div class="col-md-4">
+                  <!-- Add user profile pic here -->
+
+                  {% if user.profile_picture %}
+                  <img src="{{ user.profile_picture.url }}" alt="Profile Picture" width="100%">
+                {% else %}
+                  <p>No profile picture available</p>
+                {% endif %}
+                  <p>{{ user.first_name }} {{ user.last_name }}</p>
+                  <p>{{ user.username }}</p>
+                  <p>{{ user.email }}</p>
+                </div>
+                <!-- Second Column: Gender, DOB, Phone, Street, City, Zip Code, Member Status, Created Date, AccountID -->
+                <div class="col-md-8">
+                  <p>Gender: {{ user.gender }}</p>
+                  <p>Date of Birth: {{ user.date_of_birth }}</p>
+                  <p>Phone: {{ user.phone_number }}</p>
+                  <p>Street: {{ user.street }}</p>
+                  <p>City: {{ user.city }}</p>
+                  <p>Zip Code: {{ user.zip_code }}</p>
+                  <p>Member Status: {% if user.is_active %}Active{% else %}Inactive{% endif %}</p>
+                  <p>Created Date: {{ user.created_at }}</p>
+                  <p>Account ID: {{ user.additional_user_id }}</p>
+                </div>
+              </div>
+            </div>
+
+           
+
+    <h1>Add Facility and Upload File</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ facility_form.as_p }}
+        {{ file_upload_form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+
+
+
+
+
+
+
+  <!-- templates/users/user_details.html -->
+
+ 
+{% comment %} 
+    <div>
+        <h3>Uploaded Files</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Hospital</th>
+                    <th>File</th>
+                    <th>Details</th>
+                    <th>Upload Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file_upload in file_uploads %}
+                    <tr>
+                        <td>{{ file_upload.facility.name }}</td>
+                        <td>{{ file_upload.file.name }}</td>
+                        <td>{{ file_upload.file_details }}</td>
+                        <td>{{ file_upload.upload_date }}</td>
+                        <td>
+                            <a href="{% url 'upload_file' user_id=user.additional_user_id file_type='your_file_type' %}">Upload</a>
+                            <a href="{{ file_upload.file.url }}" target="_blank">View</a>
+                            <!-- Add other actions if needed -->
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+    <div>
+        <h3>Uploaded Files</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Details</th>
+                    <th>Upload Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file_upload in file_uploads %}
+                    <tr>
+                        <td>{{ file_upload.file.name }}</td>
+                        <td>{{ file_upload.file_details }}</td>
+                        <td>{{ file_upload.upload_date }}</td>
+                        <td>
+                            <a href="{{ file_upload.file.url }}" target="_blank">View</a>
+                            <!-- Add other actions if needed -->
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div> {% endcomment %}
+
+
+
+          <div class="user-details-forms">
             <table class="user-details-table">
-              <tbody>
                 <tr>
-                  <td class="first-column">Username:</td>
-                  <td>{{ user.username }}</td>
+                    <th>Form Type</th>
+                    <th>Generate PDF</th>
+                    <th>Download</th>
+                    <th>Upload</th>
                 </tr>
+        
                 <tr>
-                  <td class="first-column">Email:</td>
-                  <td>{{ user.email }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">First Name:</td>
-                  <td>{{ user.first_name }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">Last Name:</td>
-                  <td>{{ user.last_name }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">Phone Number:</td>
-                  <td>{{ user.phone_number }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">Age:</td>
-                  <td>{{ user.age }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">Gender:</td>
-                  <td>{{ user.gender }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">Security Question 1:</td>
-                  <td>{{ user.security_question_1 }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">Security Answer 1:</td>
-                  <td>{{ user.security_answer_1 }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">Security Question 2:</td>
-                  <td>{{ user.security_question_2 }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">Security Answer 2:</td>
-                  <td>{{ user.security_answer_2 }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">Uploaded File:</td>
-                  {% if user.uploaded_file %}
-                    <td><a href="{{ user.uploaded_file.url }}" target="_blank">{{ user.uploaded_file.name }}</a></td>
-                  {% else %}
-                    <td>No file uploaded</td>
-                  {% endif %}
-                </tr>
-                <tr>
-                  <td class="first-column">Additional Field 1:</td>
-                  <td>{{ user.additional_field_1 }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">Additional Field 2:</td>
-                  <td>{{ user.additional_field_2 }}</td>
-                </tr>
-                <tr>
-                  <td class="first-column">Doctor's Form:</td>
-                  <td><a href="{% url 'doctor_note_form' additional_user_id=user.id %}">Go to Doctor's Form</a></td>
-                </tr>
-                <tr>
-                  <td class="first-column">Generate PDF:</td>
-                  <td>
-                    {% if user.doctor_notes.exists %}
-                      <a href="{% url 'generate_pdf' doctor_note_id=user.doctor_notes.last.id %}">Generate PDF</a>
-                    {% else %}
-                      No doctor notes available
-                    {% endif %}
+                    <td> Doctor Notes</td>
+                    <td><a href="{% url 'view_nursing_notes' additional_user_id=user.additional_user_id %}">View Nursing Notes</a></td>
+
+                    {% comment %} <td><a href="{% url 'doctor_note_form' additional_user_id=user.additional_user_id %}">Doctor Notes</a></td> {% endcomment %}
+                    <td>
+                        {% if user.doctors_notes %}
+                            <a href="{% url 'download_file' additional_user_id=user.additional_user_id file_type='doctors_notes' %}">Download</a>
+                        {% endif %}
+                    </td>
+                    <td>
+                      {% comment %} <a href="{% url 'upload_file' additional_user_id=user.additional_user_id file_type='doctors_notes' %}">
+                          <button type="button">
+                              <i class="fas fa-cloud-upload-alt"></i> Upload
+                          </button>
+                      </a> {% endcomment %}
+                      {% comment %} <form id="uploadFormDoctorsNotes" method="post" action="{% url 'upload_file' additional_user_id=user.additional_user_id file_type='doctors_notes' %}" enctype="multipart/form-data">
+                          {% csrf_token %}
+                          {{ form.doctors_notes }}
+                      </form> {% endcomment %}
+                  
+                      <script>
+                          // Attach a click event listener to the button
+                          document.querySelector('#uploadFormDoctorsNotes button').addEventListener('click', function() {
+                              // Trigger the form submission when the button is clicked
+                              document.getElementById('uploadFormDoctorsNotes').submit();
+                          });
+                      </script>
                   </td>
                 </tr>
-                <!-- Add more fields as needed -->
-              </tbody>
+        
+              
+      
+              <tr>
+                  <td> Discharge Notes</td>
+                  <td><a href="{% url 'doctor_note_form' additional_user_id=user.additional_user_id %}">Discharge Notes</a></td>
+                  <td>
+                      {% if user.doctors_notes %}
+                          <a href="{% url 'download_file' additional_user_id=user.additional_user_id file_type='doctors_notes' %}">Download</a>
+                      {% endif %}
+                  </td>
+                  <td>
+                    {% comment %} <a href="{% url 'upload_file' additional_user_id=user.additional_user_id file_type='doctors_notes' %}">
+                        <button type="button">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload
+                        </button>
+                    </a> {% endcomment %}
+                    {% comment %} <form id="uploadForm" method="post" action="{% url 'upload_file' additional_user_id=user.additional_user_id file_type='doctors_notes' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.doctors_notes }}
+                    </form> {% endcomment %}
+                
+                    <script>
+                        document.querySelector('button').addEventListener('click', function() {
+                            document.getElementById('uploadForm').submit();
+                        });
+                    </script>
+                </td>
+                  
+    
+                  </td>
+              </tr>
+        
             </table>
-          </div>
+        </div>
+
         </div>
       </div>
     </div>

@@ -10,6 +10,9 @@ from multiselectfield import MultiSelectField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from .models import *
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.contrib.auth import get_user_model
+
 
 class AccountManager(BaseUserManager):
     
@@ -26,23 +29,23 @@ class AccountManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
+  
+    def create_user(self, first_name, last_name, username, email, password=None, account_id=None, **extra_fields):
+            user = self.model(
+                email=self.normalize_email(email),
+                first_name=first_name,
+                last_name=last_name,
+                username=username,
+                account_id=account_id,
+                **extra_fields,
+            )
 
-    def create_superuser(self, email, first_name, last_name, username, password, **extra_fields):
-        user = self.create_user(
-            email=self.normalize_email(email),
-            username=username,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            **extra_fields,  # Include additional fields
-        )
-        user.is_admin = True
-        user.is_active = True
-        user.is_staff = True
-        user.is_superadmin = True
-        user.save(using=self._db)
-        return user
-        
+            if password:
+                user.set_password(password)
+
+            user.save(using=self._db)
+            return user
+ 
 
     def get_account_by_security_answers(self, security_question_1, security_answer_1, security_question_2, security_answer_2):
         try:
@@ -132,10 +135,84 @@ class Patient(models.Model):
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
 
+
 # models.py
-
 from django.db import models
+from django.contrib.auth import get_user_model
 
+
+class AdditionalUser(models.Model):
+    creator = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='additional_users_created')
+    additional_user_id = models.AutoField(primary_key=True)  # Change to AutoField for auto-generation
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    email = models.EmailField(max_length=100)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    username = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=50)
+    security_question_1 = models.CharField(max_length=100, blank=True, null=True)
+    security_answer_1 = models.CharField(max_length=100, blank=True, null=True)
+    security_question_2 = models.CharField(max_length=100, blank=True, null=True)
+    security_answer_2 = models.CharField(max_length=100, blank=True, null=True)
+    password = models.CharField(max_length=128)  # Store the hashed password
+    profile_picture = models.ImageField(upload_to='additional_user_profiles/', null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    street = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    zip_code = models.CharField(max_length=10, blank=True, null=True)
+    age = models.IntegerField(blank=True, null=True)
+    gender = models.CharField(max_length=10, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+    def save(self, *args, **kwargs):
+        if not self.pk: 
+            self.creator.set_password(self.password)
+            self.creator.save()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Additional User for {self.creator.username}"
+
+# models.py
+from django.db import models
+from .models import AdditionalUser
+class FileUpload(models.Model):
+    user = models.ForeignKey(AdditionalUser, on_delete=models.CASCADE, related_name='file_uploads')
+    facility = models.CharField(max_length=100, null=True, blank=True)
+    file = models.FileField(upload_to='user_uploads/')
+    upload_date = models.DateTimeField(auto_now_add=True)
+    file_details = models.TextField(blank=True)
+
+    def get_file_url(self):
+        return f"/view-file/{self.id}/"
+
+    def __str__(self):
+        return f"{self.user.creator.username} - {self.file.name}"
+
+
+
+
+class DoctorNote(models.Model):
+    additional_user = models.ForeignKey(AdditionalUser, on_delete=models.CASCADE, related_name='doctor_notes')
+    name = models.CharField(max_length=100)
+    age = models.IntegerField()
+    date = models.DateField()
+    diagnosis = models.TextField()
+    duration_on_dialysis = models.CharField(max_length=50)
+    current_medication = models.TextField()
+    general_status = models.CharField(max_length=50)
+    access_site_status = models.CharField(max_length=50)
+    bp = models.CharField(max_length=20)
+    qb_rate = models.CharField(max_length=20)
+    ultrafiltration_volume = models.CharField(max_length=20)
+    investigations = models.TextField()
+    plan = models.TextField()
+
+    def __str__(self):
+        return f"Doctor's Note for {self.additional_user}"
+    
 class PatientDischarge(models.Model):
     facility = models.CharField(max_length=200)
     date_time = models.DateTimeField()
@@ -163,66 +240,6 @@ class PatientDischarge(models.Model):
     def __str__(self):
         return self.patient_name
 
-from django.db import models
-from django.contrib.auth import get_user_model
-
-class AdditionalUser(models.Model):
-    creator = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='additional_users_created')
-    additional_user_id = models.CharField(max_length=32, unique=True)  # Use a unique identifier for AdditionalUser
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    # Additional fields for the additional user
-    additional_field_1 = models.CharField(max_length=100, blank=True, null=True)
-    additional_field_2 = models.CharField(max_length=100, blank=True, null=True)
-
-    email = models.EmailField(max_length=100)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    username = models.CharField(max_length=50)
-    phone_number = models.CharField(max_length=50)
-    security_question_1 = models.CharField(max_length=100, blank=True, null=True)
-    security_answer_1 = models.CharField(max_length=100, blank=True, null=True)
-    security_question_2 = models.CharField(max_length=100, blank=True, null=True)
-    security_answer_2 = models.CharField(max_length=100, blank=True, null=True)
-    password = models.CharField(max_length=128)  # Store the hashed password
-    doctors_notes = models.FileField(upload_to='uploaded_doctor/', null=True, blank=True)
-    referralnotes = models.FileField(upload_to='uploaded_referal/', null=True, blank=True)
-    preproceduralnotes = models.FileField(upload_to='uploaded_preprocedural/', null=True, blank=True)
-  
-    age = models.IntegerField(blank=True, null=True)
-    gender = models.CharField(max_length=10, blank=True, null=True)
-    # Add more demographic fields as needed
-
-    is_active = models.BooleanField(default=True)
-
-    def save(self, *args, **kwargs):
-        self.creator.set_password(self.password)
-        self.creator.save()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"Additional User for {self.creator.username}"
-    
-
-class DoctorNote(models.Model):
-    additional_user = models.ForeignKey(AdditionalUser, on_delete=models.CASCADE, related_name='doctor_notes')
-    name = models.CharField(max_length=100)
-    age = models.IntegerField()
-    date = models.DateField()
-    diagnosis = models.TextField()
-    duration_on_dialysis = models.CharField(max_length=50)
-    current_medication = models.TextField()
-    general_status = models.CharField(max_length=50)
-    access_site_status = models.CharField(max_length=50)
-    bp = models.CharField(max_length=20)
-    qb_rate = models.CharField(max_length=20)
-    ultrafiltration_volume = models.CharField(max_length=20)
-    investigations = models.TextField()
-    plan = models.TextField()
-
-    def __str__(self):
-        return f"Doctor's Note for {self.additional_user}"
 
   
 class HealthcareSpecialty(models.Model):
@@ -678,3 +695,19 @@ class TreatmentRecord(models.Model):
 
     def __str__(self):
         return f"Medication: {self.prescribed_medication}, Start Date: {self.start_date}"
+
+
+class Nursing_Notes(models.Model):
+    uhid=models.CharField(max_length=30)
+    patient_name=models.CharField(max_length=100)
+    age=models.CharField(max_length=100)
+    gender=models.CharField(max_length=100)
+    diagnosis=models.CharField(max_length=100)
+    hosp_no=models.CharField(max_length=100)
+    chemotherapy_protocol=models.CharField(max_length=100)
+
+class Nursing_Notes_sub(models.Model):
+    uhid=models.CharField(max_length=30)
+    date_time=models.CharField(max_length=100)
+    nursing_notes=models.CharField(max_length=100)
+    name_sign=models.CharField(max_length=100)

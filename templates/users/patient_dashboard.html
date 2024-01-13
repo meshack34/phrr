@@ -81,11 +81,8 @@
                     <th>#</th>
                     <th>Person</th>
                     <th>Username</th>
-                    <th>Health Summary</th>
-                    <th>Doctor Notes</th>
+                    <th>Phone</th>
                     <th>Health trackers</th>
-
-                    <th>Action</th>
                   <th>Action</th>
                 </thead>
                 <tbody>
@@ -94,39 +91,15 @@
                       <td>{{ forloop.counter }}</td>
                       
                       <td><a href="{% url 'user_details' additional_user_id=user.additional_user_id %}">{{ user.first_name }} {{ user.last_name }}</a></td>
-                     
-
-                        <td>{{ user.username }}</td>
+            
+                        <td><a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">{{ user.username }}</td>
                       <td>
-                        {% if user.uploaded_file %}
-                          <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
-                            <i class="fas fa-download"></i> Download
-                          </a>
-                        {% endif %}
-                        <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
-                          <i class="fas fa-upload"></i> Upload
-                        </a>
+                        {{ user.phone_number }}
                       </td>
                       
                     <td><a href="{% url 'doctor_note_form' additional_user_id=user.additional_user_id %}">Doctor Notes</a>
-                      {% if user.uploaded_file %}
-                          <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
-                            <i class="fas fa-download"></i> Download
-                          </a>
-                        {% endif %}
-                        <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
-                          <i class="fas fa-upload"></i> Upload
-                        </a></td>
-                 <td>
-                        {% if user.uploaded_file %}
-                          <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
-                            <i class="fas fa-download"></i> Download
-                          </a>
-                        {% endif %}
-                        <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
-                          <i class="fas fa-upload"></i> Upload
-                        </a>
-                      </td>
+                     </td>
+                 
                       <td>
                         <a href="#" target="_blank"><i class="fas fa-print"></i></a>
                         <a href="#"><i class="fas fa-edit"></i></a>
@@ -176,26 +149,8 @@
                         <td> <a href="#">{{ user.first_name }} {{ user.last_name }}</a></td>
                         <td>{{ user.username }}</td>
                         
-                         <td>
-                          {% if user.uploaded_file %}
-                            <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
-                              <i class="fas fa-download"></i> Download
-                            </a>
-                          {% endif %}
-                          <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
-                            <i class="fas fa-upload"></i> Upload
-                          </a>
-                        </td>
-                         <td>
-                          {% if user.uploaded_file %}
-                            <a href="{% url 'download_file' additional_user_id=user.additional_user_id %}" download>
-                              <i class="fas fa-download"></i> Download
-                            </a>
-                          {% endif %}
-                          <a href="{% url 'upload_file' additional_user_id=user.additional_user_id %}">
-                            <i class="fas fa-upload"></i> Upload
-                          </a>
-                        </td>
+                         
+                       
                         <td>
                             <a href="#" target="_blank"><i class="fas fa-print"></i></a>
                             <a href="#"><i class="fas fa-edit"></i></a>

@@ -1,15 +1,241 @@
-<!-- create_additional_user.html -->
-
+<!-- users/create_additional_user.html -->
 {% extends "base.html" %}
 {% load static %}
 
 {% block content %}
-  <div class="container">
-    <h2>Create Additional User</h2>
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Create User</button>
-    </form>
+  <div class="content">
+    <div class="container-fluid">
+      <div class="row">
+        
+        {% include 'users/patientsidenav.html' %}
+
+        <div class="col-md-7 col-lg-8 col-xl-9">
+          <div class="card">
+            <div class="card-body">
+              <!-- Create Additional User Form -->
+              <form method="post" action="{% url 'create_additional_user' %}" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    {{ form.creator.label_tag }}
+                    {{ form.creator }}
+                    <div class="invalid-feedback">
+                      Please provide a creator.
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    {{ form.additional_user_id.label_tag }}
+                    {{ form.additional_user_id }}
+                    <div class="invalid-feedback">
+                      Please provide an additional user ID.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    {{ form.created_at.label_tag }}
+                    {{ form.created_at }}
+                    <div class="invalid-feedback">
+                      Please provide a creation date and time.
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    {{ form.updated_at.label_tag }}
+                    {{ form.updated_at }}
+                    <div class="invalid-feedback">
+                      Please provide an update date and time.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    {{ form.first_name.label_tag }}
+                    {{ form.first_name }}
+                    <div class="invalid-feedback">
+                      Please provide a value for Additional Field 1.
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    {{ form.last_name.label_tag }}
+                    {{ form.last_name }}
+                    <div class="invalid-feedback">
+                      Please provide a value for Additional Field 2.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row"><div class="col-md-6 mb-3">
+                  {{ form.email.label_tag }}
+                  {{ form.email }}
+                  <div class="invalid-feedback">
+                    Please provide a value for Additional Field 1.
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  {{ form.username.label_tag }}
+                  {{ form.username }}
+                  <div class="invalid-feedback">
+                    Please provide a value for Additional Field 2.
+                  </div>
+                </div>
+              </div>
+              <div class="row"><div class="col-md-6 mb-3">
+                {{ form.phone_number.label_tag }}
+                {{ form.phone_number }}
+                <div class="invalid-feedback">
+                  Please provide a value for Additional Field 1.
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                {{ form.security_question_1.label_tag }}
+                {{ form.security_question_1 }}
+                <div class="invalid-feedback">
+                  Please provide a value for Additional Field 2.
+                </div>
+              </div>
+            </div>
+            <div class="row"><div class="col-md-6 mb-3">
+              {{ form.security_answer_1.label_tag }}
+              {{ form.security_answer_1 }}
+              <div class="invalid-feedback">
+                Please provide a value for Additional Field 1.
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              {{ form.security_question_2.label_tag }}
+              {{ form.security_question_2 }}
+              <div class="invalid-feedback">
+                Please provide a value for Additional Field 2.
+              </div>
+            </div>
+            
+          </div>
+          <div class="row"><div class="col-md-6 mb-3">
+            {{ form.security_answer_2.label_tag }}
+            {{ form.security_answer_2 }}
+            <div class="invalid-feedback">
+              Please provide a value for Additional Field 1.
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            <div class="invalid-feedback">
+              Please provide a value for Additional Field 2.
+            </div>
+          </div>
+          
+        </div>
+        <div class="row"><div class="col-md-6 mb-3">
+          {{ form.doctors_notes.label_tag }}
+          {{ form.doctors_notes }}
+          <div class="invalid-feedback">
+            Please provide a value for Additional Field 1.
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          {{ form.referralnotes.label_tag }}
+          {{ form.referralnotes }}
+          <div class="invalid-feedback">
+            Please provide a value for Additional Field 2.
+          </div>
+        </div>
+      </div>
+
+      <div class="row"><div class="col-md-6 mb-3">
+        {{ form.preproceduralnotes.label_tag }}
+        {{ form.preproceduralnotes }}
+        <div class="invalid-feedback">
+          Please provide a value for Additional Field 1.
+        </div>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        {{ form.referralnotes.label_tag }}
+        {{ form.referralnotes }}
+        <div class="invalid-feedback">
+          Please provide a value for Additional Field 2.
+        </div>
+      </div>
+      
+    </div>
+
+    <div class="row"><div class="col-md-6 mb-3">
+      {{ form.profile_picture.label_tag }}
+      {{ form.profile_picture }}
+      <div class="invalid-feedback">
+        Please provide a value for Additional Field 1.
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      {{ form.date_of_birth.label_tag }}
+      {{ form.date_of_birth }}
+      <div class="invalid-feedback">
+        Please provide a value for Additional Field 2.
+      </div>
+      <script>
+        // Activate date picker for the date_of_birth field
+        $(document).ready(function(){
+          $('#id_date_of_birth').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true,
+          });
+        });
+      </script>
   </div>
+    <div class="row"><div class="col-md-6 mb-3">
+      {{ form.street.label_tag }}
+      {{ form.street }}
+      <div class="invalid-feedback">
+        Please provide a value for Additional Field 1.
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      {{ form.city.label_tag }}
+      {{ form.city }}
+      <div class="invalid-feedback">
+        Please provide a value for Additional Field 2.
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 mb-3">
+    {{ form.is_active.label_tag }}
+    {{ form.is_active }}
+    <div class="invalid-feedback">
+      Please provide the is active status.
+    </div>
+  </div>
+</div>
+                <button type="submit" class="btn btn-primary">Create User</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+  <!-- Your HTML content goes here -->
+
+  <!-- Include Bootstrap JS and Popper.js -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 {% endblock %}

@@ -108,6 +108,7 @@ class AdditionalUserForm(forms.ModelForm):
         model = AdditionalUser
         exclude = ['account_id'] 
         fields = '__all__'
+        
 from django import forms
 from .models import DoctorNote
 
@@ -115,6 +116,28 @@ class DoctorNoteForm(forms.ModelForm):
     class Meta:
         model = DoctorNote
         fields = '__all__'
+class DoctorNoteForm(forms.ModelForm):
+    class Meta:
+        model = DoctorNote
+        fields = '__all__'
+
+class DoctorNoteForm(forms.ModelForm):
+    class Meta:
+        model = DoctorNote
+        fields = '__all__'
+
+
+# forms.py
+from django import forms
+from .models import FileUpload
+
+class FileUploadForm(forms.ModelForm):
+    class Meta:
+        model = FileUpload
+        fields = ['facility', 'file', 'file_details']
+
+# AdditionalUserForm (if needed)
+# You can create a form for AdditionalUser if necessary, based on the fields you want to include in the form.
 
 
 class PatientForm(forms.ModelForm):
@@ -208,12 +231,6 @@ class VitalsForm(forms.ModelForm):
         model = Vitals
         fields = ['temperature', 'heart_rate', 'blood_pressure_systolic', 'blood_pressure_diastolic', 'respiratory_rate', 'oxygen_saturation']
 
-##################################
-
-# forms.py
-
-# forms.py
-# forms.py
 
 from django import forms
 from .models import PatientDischarge
@@ -221,7 +238,7 @@ from .models import PatientDischarge
 class PatientDischargeForm(forms.ModelForm):
     class Meta:
         model = PatientDischarge
-        exclude = []  # You can exclude fields if needed
+        exclude = []  
 
 from django import forms
 from .models import Exercise, Dietary, Smoking, Alcohol, Medications, Lifestyle
