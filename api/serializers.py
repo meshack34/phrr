@@ -4,23 +4,29 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from rest_framework import serializers
 from patientapp.models import *
-
-#Serializers of models
+from rest_framework import serializers
+from patientapp.models import Account, EmergencyContact, Patient
 
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = "__all__"
+        fields = ['email', 'first_name', 'last_name', 'username', 'phone_number']
 
 class EmergencyContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmergencyContact
-        fields = "__all__"
+        fields = '__all__'
 
-class PatientSerializer(serializers.ModelSerializer):
+class RegistrationSerializer(serializers.ModelSerializer):
+    emergency_contact = EmergencyContactSerializer()
+    user = AccountSerializer()
+
     class Meta:
         model = Patient
-        fields = "__all__"
+        fields = '__all__'
+
+
+
 
 
 class NursingNotesSerializer(serializers.ModelSerializer):

@@ -1,9 +1,9 @@
 from django.utils.http import urlsafe_base64_decode
 from django.template.loader import get_template
-
+from .forms import PatientDischargeForm
+from django.shortcuts import render
 from django.http import Http404
 from .models import AdditionalUser
-from django.http import HttpResponse
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 from .forms import DoctorNoteForm
@@ -251,16 +251,6 @@ def recover_account_id(request):
     else:
         # Display the form to input security answers
         return render(request, 'users/account_recovery.html')
-
-# views.py
-# views.py
-
-from .forms import PatientDischargeForm
-from django.shortcuts import render
-from .forms import PatientDischargeForm
-from django.template.loader import get_template
-from django.http import HttpResponse
-
 
 def discharge_form(request):
     if request.method == 'POST':
