@@ -2,41 +2,25 @@
 {% load static %}
 
 {% block content %}
+<!-- Home Banner -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient</title>
+    <title>Healthcare Hub</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <style>
-        .section-header {
-            background-color: #3498db;
-            color: #fff;
-            padding: 20px;
-        }
-
-        .section-header h2 {
-            font-size: 24px;
-        }
-
-        .section-header p {
-            font-size: 16px;
-        }
-
-        /* Adjust other styles as needed */
-    </style>
 </head>
 <body>
     <!-- Home Banner -->
-    <section class="section">
+    <section class="section section-search">
         <div class="container-fluid">
             <div class="banner-wrapper">
                 <div class="banner-header text-center">
-                    <h1>Welcome to Our Healthcare Platform</h1>
-                    <p>Discover top healthcare professionals and book appointments online.</p>
+                    <h1>Welcome to the Future of Healthcare</h1>
+                    <p>Discover the best doctors and make appointments online.</p>
                 </div>
-
+                
                 <!-- Search Box -->
                 <div class="search-box">
                     <form action="search.html">
@@ -45,41 +29,88 @@
                             <span class="form-text">Based on your Location</span>
                         </div>
                         <div class="form-group search-info text-center">
-                            <input type="text" class="form-control" placeholder="Search Doctors, Clinics, Hospitals, Conditions, etc.">
-                            <span class="form-text">E.g., Dermatology or Diabetes Check-up, etc.</span>
+                            <input type="text" class="form-control" placeholder="Search Doctors, Clinics, Hospitals, Diseases, etc.">
+                            <span class="form-text">E.g., Dental or Sugar Check-up, etc.</span>
                         </div>
                         <button type="submit" class="btn btn-primary search-btn"><i class="fas fa-search"></i> <span>Search</span></button>
                     </form>
-                </div>
+                </div> 
                 <!-- /Search Box -->
+                
             </div>
         </div>
     </section>
     <!-- /Home Banner -->
 
-    <!-- Clinic and Specialties -->
+    <!-- Clinic and Specialities -->
     <section class="section section-specialities">
         <div class="container-fluid">
             <div class="section-header text-center">
                 <h2>Specialist Doctors</h2>
-                <p class="sub-title">Discover experts in various medical fields!</p>
+                <p class="sub-title">Find the best doctors in all fields!</p>
             </div>
             <div class="row justify-content-center">
                 <div class="col-md-9">
-                    <!-- Specialties List -->
-                    <ul>
-                        <li>Dermatology</li>
-                        <li>Cardiology</li>
-                        <li>Neurology</li>
-                        <li>Gastroenterology</li>
-                        <li>Ophthalmology</li>
-                    </ul>
-                    <!-- /Specialties List -->
+                    <!-- Specialities Slider -->
+                    <div class="specialities-slider slider">
+                        <!-- Slider Item 1 -->
+                        <div class="specialty-item text-center">
+                            <div class="specialty-img">
+                                <img src="{% static 'img/specialities/specialities-01.png' %}" class="img-fluid" alt="Specialty">
+                                <span><i class="fa fa-circle" aria-hidden="true"></i></span>
+                            </div>
+                            <p>Urology</p>
+                        </div>	
+                        <!-- /Slider Item 1 -->
+                        
+                        <!-- Slider Item 2 -->
+                        <div class="specialty-item text-center">
+                            <div class="specialty-img">
+                                <img src="{% static 'img/specialities/specialities-02.png' %}" class="img-fluid" alt="Specialty">
+                                <span><i class="fa fa-circle" aria-hidden="true"></i></span>
+                            </div>
+                            <p>Neurology</p>	
+                        </div>							
+                        <!-- /Slider Item 2 -->
+                        
+                        <!-- Slider Item 3 -->
+                        <div class="specialty-item text-center">
+                            <div class="specialty-img">
+                                <img src="{% static 'img/specialities/specialities-03.png' %}" class="img-fluid" alt="Specialty">
+                                <span><i class="fa fa-circle" aria-hidden="true"></i></span>
+                            </div>	
+                            <p>Orthopedic</p>	
+                        </div>							
+                        <!-- /Slider Item 3 -->
+                        
+                        <!-- Slider Item 4 -->
+                        <div class="specialty-item text-center">
+                            <div class="specialty-img">
+                                <img src="{% static 'img/specialities/specialities-04.png' %}" class="img-fluid" alt="Specialty">
+                                <span><i class="fa fa-circle" aria-hidden="true"></i></span>
+                            </div>	
+                            <p>Cardiology</p>	
+                        </div>							
+                        <!-- /Slider Item 4 -->
+                        
+                        <!-- Slider Item 5 -->
+                        <div class="specialty-item text-center">
+                            <div class="specialty-img">
+                                <img src="{% static 'img/specialities/specialities-05.png' %}" class="img-fluid" alt="Specialty">
+                                <span><i class="fa fa-circle" aria-hidden="true"></i></span>
+                            </div>	
+                            <p>Dentistry</p>
+                        </div>							
+                        <!-- /Slider Item 5 -->
+                        
+                    </div>
+                    <!-- /Specialities Slider -->
+                    
                 </div>
             </div>
-        </div>
-    </section>
-    <!-- /Clinic and Specialties -->
+        </div>   
+    </section>	 
+    <!-- End Clinic and Specialities -->
 
     <!-- Popular Section -->
     <section class="section section-doctor">
@@ -92,9 +123,18 @@
                 <div class="col-lg-11">
                     <!-- Doctor Slider -->
                     <div class="doctor-slider slider">
-                        <!-- Doctor Widget -->
                         {% for doctor in doctors %}
+                            
+                        <!-- Doctor Widget -->
                         <div class="profile-widget">
+                            <div class="doc-img">
+                                <a href="{% url 'profile' doctor.id %}">
+                                    <img class="img-fluid" alt="Doctor Image" src="{{ doctor.profile_image.url }}">
+                                </a>
+                                <a href="javascript:void(0)" class="fav-btn">
+                                    <i class="far fa-bookmark"></i>
+                                </a>
+                            </div>
                             <div class="pro-content">
                                 <h3 class="title">
                                     <a href="{% url 'profile' doctor.id %}">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</a> 
@@ -127,8 +167,8 @@
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
                         <!-- /Doctor Widget -->
+                        {% endfor %}
                     </div>
                     <!-- /Doctor Slider -->
                 </div>
@@ -137,62 +177,15 @@
     </section>
     <!-- /Popular Section -->
 
-    <!-- About Us Section -->
-    <section class="section section-doctor">
-        <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="section-header text-center">
-                    <h2>About Us</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla commodo dui in dui pellentesque, ut venenatis justo fringilla.</p>
-                    <!-- Add more content about your medical practice here -->
-                </div>
-            </div>
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Healthcare Hub. All rights reserved.</p>
         </div>
-    </section>
-    <!-- /About Us Section -->
-
-    <!-- Contact Us Section -->
-    <section class="section section-specialities">
-        <div class="container-fluid">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h2>Contact Us</h2>
-                        <p>If you have any questions or need assistance, please feel free to contact us:</p>
-                        <ul>
-                            <li>Nairobi, Kenya</li>
-                            <li>PO Box 37791 GPO,</li>
-                            <li>+254 729 364 763</li>
-                            <li>Email: karthik@bharathbrands.com</li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <h2>Contact Form</h2>
-                        <!-- Basic Contact Form -->
-                        <form action="#" method="post">
-                            <div class="form-group">
-                                <label for="name">Your Name</label>
-                                <input type="text" id="name" name="name" class="form-control" placeholder="Your Name">
-                            </div>
-                            <div class="form-group">
-                                <label for="email">Your Email</label>
-                                <input type="email" id="email" name="email" class="form-control" placeholder="Your Email">
-                            </div>
-                            <div class="form-group">
-                                <label for="message">Message</label>
-                                <textarea id="message" name="message" class="form-control" rows="4" placeholder="Your Message"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Send Message</button>
-                        </form>
-                        <!-- /Basic Contact Form -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- /Contact Us Section -->
+    </footer>
 
     <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
+
+
 {% endblock content %}
