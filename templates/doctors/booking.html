@@ -8,6 +8,9 @@
 	
 		<div class="row">
 			<div class="col-12">
+            
+              
+            
 				<div class="card">
 					<div class="card-body">
 						<div class="booking-doc-info">
@@ -19,10 +22,13 @@
 								<h4><a href="doctor-profile.html">username:  {{doctor.user.username}} </a></h4>
 								<h4><a href="doctor-profile.html">phone_number: {{doctor.user.phone_number}} </a></h4>
 								<h4><a href="doctor-profile.html">email: {{doctor.user.email}} </a></h4>
+								
 							</div>
 						</div>
 					</div>
 				</div>
+                
+				
 				<!-- Schedule Widget -->
 				<div class="card booking-schedule schedule-widget">
 				
@@ -40,12 +46,15 @@
 												<span class="slot-date">{{appoint_day}}</span>
 											</li>
 										{% endfor %}
+								
 									</ul>
 								</div>
+								<!-- /Day Slot -->
 								
 							</div>
 						</div>
 					</div>
+					<!-- /Schedule Header -->
 					
 					<!-- Schedule Content -->
 					<div class="schedule-cont">
@@ -56,11 +65,13 @@
 								<div class="time-slot ">
 									<ul class="clearfix ">
 
-										{% for appoint_day in appoint_day %}	
+										{% for appoint_day in appoint_day %}
+												
 												  
 										<form action="{% url 'patient_appointment' doctor.id %}" method="POST">
 												{% csrf_token %}
 										<li style="margin-right: 50px;">
+											
 											
 												<span >
 													

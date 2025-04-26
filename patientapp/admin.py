@@ -2,21 +2,23 @@ from django.contrib import admin
 
 from .models import *
 from django.contrib import admin
-from .models import Doctor, DoctorSpecialization, AppointmentTime,PatientAppointment,Allergy
+from .models import Doctor, DoctorSpecialization, AppointmentTime,PatientAppointment
 
 
 
 admin.site.register(Patient)
+admin.site.register(Card)
+
 admin.site.register(PrescriptionStatus)
+
 admin.site.register(Doctor)
 admin.site.register(DoctorSpecialization)
 admin.site.register(AppointmentTime)
 admin.site.register(PatientAppointment)
-admin.site.register(Allergy)
-admin.site.register(NewmedicalHistory)
 
 
 class MedicalHistoryAdmin(admin.ModelAdmin):
+
     list_display = ('patient','doctor', 'is_active', 'date_created')
     list_display_links = ('patient', 'doctor')
 

@@ -35,73 +35,24 @@
                     <li>
                         <a href="{% url 'patients_profile' %}">
                             <i class="fas fa-user-cog"></i>
-                            <span>Profile Informations</span>
+                            <span>Profile Settings</span>
                         </a>
                     </li>
-                     <li>
-                        <a href="{% url 'manage_emergency_contact' %}">
-                            <i class="fas fa-user-cog"></i>
-                            <span>Emergency Informations</span>
-                        </a>
-                    </li>
+                  
                     <li>
-                        <a href="{% url 'add_healthcare_speciality' %}">
+                        <a href="{% url 'doctors' %}">
                             <i class="fas fa-calendar"></i>
-                            <span>Healthcare Specialization </span>
+                            <span>Appointment</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'healthcare_professionals' %}">
-                            <i class="fas fa-calendar"></i>
-                            <span>Health professional</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'health_insurance_list' %}">
-                            <i class="fas fa-calendar"></i>
-                            <span>Health Insurance detail</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'view_treatment_records' %}">
-                            <i class="fas fa-calendar"></i>
-                            <span>Treatment Records</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'view_medical_history' %}">
+                        <a href="{% url 'view_history' patient.id %}">
                             <i class="fas fa-calendar"></i>
                             <span>Medical History</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'view_vitals' %}">
-                            <i class="fas fa-calendar"></i>
-                            <span> Vitals</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'newview_medical_history' %}">
-                            <i class="fas fa-calendar"></i>
-                            <span>Consultation Page</span>
-                        </a>
-                    </li>   
-                    <li>
-                        <a href="{% url 'view_lifestyle_details' %}">
-                            <i class="fas fa-calendar"></i>
-                            <span>Lifestyle Information</span>
-                        </a>
-                    </li>
-                    
-                    
-                    <li>
-                        <a href="{% url 'health_goal_list' %}">
-                            <i class="fas fa-calendar"></i>
-                            <span>Health Goals </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="">
+                        <a href="{% url 'view_medical_history' patient.id %}">
                             <i class="fas fa-calendar"></i>
                             <span>Billing & Payment </span>
                         </a>

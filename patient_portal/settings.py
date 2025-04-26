@@ -14,14 +14,7 @@ SECRET_KEY = 'django-insecure-fh+zkylo9^^&g6y$(2$g_ia(!h96qpsmnc!+mnau=*9favmkd%
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-# settings.py
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'meshackkimutai34@gmail.com'
-EMAIL_HOST_PASSWORD = 'mscm ogka yhij bvgy'
 
 # Application definition
 
@@ -36,8 +29,6 @@ INSTALLED_APPS = [
     'multiselectfield',
     'rest_framework',
     'rest_framework_simplejwt',
-    'django_twilio',
-    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -52,7 +43,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'patient_portal.urls'
-
 
 TEMPLATES = [
     {
@@ -130,10 +120,6 @@ AUTH_USER_MODEL = 'patientapp.Account'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-AUTHENTICATION_BACKENDS = [
-    'patientapp.backends.MyCustomBackend',  
-    'django.contrib.auth.backends.ModelBackend',
-]
 
 REST_FRAMEWORK = {
    "DEFAULT_PERMISSION_CLASSES": [
